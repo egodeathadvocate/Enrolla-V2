@@ -2007,6 +2007,7 @@
         let restoredBackendSessionId = null;
         let signupSubmitting = false;
         let signupCooldownTimer = null;
+        let suppressBackendStartupErrors = false;
 
         // Safe Storage Helpers (Prevents SecurityError in sandboxed iframes or file:// contexts)
         function safeGetItem(key) {
@@ -2036,6 +2037,7 @@
         }
         function backendError(context, error) {
             console.error(`[Supabase] ${context}`, error);
+            if (suppressBackendStartupErrors) return;
             showToast(`${context} failed. Please try again.`, 'error');
         }
         async function supabaseQuery(query, context) {
@@ -3357,7 +3359,36 @@
                 }
             }
             currentSession = { role: profile.role, userId: profile.student_id || profile.id, authUserId: profile.id, name: profile.full_name || session.user.email, isDemo: !!profile.is_demo };
-            await loadBackendState();
+            suppressBackendStartupErrors = true;
+            try {
+                await loadBackendState();
+            } catch (error) {
+                console.error('[Supabase] Portal data could not be loaded during session restore', error);
+                courses = JSON.parse(JSON.stringify(DEFAULT_COURSES));
+                programs = JSON.parse(JSON.stringify(DEFAULT_PROGRAMS));
+                enrollmentSettings = { ...DEFAULT_SETTINGS };
+                enrollments = [];
+                specialRequests = [];
+                auditLogs = [];
+                students = [{
+                    id: profile.id,
+                    userId: profile.id,
+                    studentId: profile.student_id || profile.id,
+                    fullName: profile.full_name || session.user.email || 'Student',
+                    email: profile.email || session.user.email || '',
+                    contact: profile.contact || '',
+                    programCode: profile.program_code || '',
+                    yearLevel: profile.year_level || '',
+                    enrollmentStatus: profile.enrollment_status || 'Not Enrolled',
+                    isDemo: !!profile.is_demo
+                }];
+                admins = [];
+                notifications = [];
+                profileData = {};
+                medicalCleared = false;
+            } finally {
+                suppressBackendStartupErrors = false;
+            }
             setupRealtimeSubscriptions();
             if (profile.role === 'admin' || profile.role === 'super_admin') {
                 byId('login-view').style.display = 'none';
@@ -5515,13 +5546,26 @@
                 if (data.session) await restoreBackendSession(data.session);
                 else {
                     byId('demo-account-actions').style.display = ENABLE_DEMO_ACCOUNTS ? 'flex' : 'none';
-                    await loadBackendState();
+                    suppressBackendStartupErrors = true;
+                    try {
+                        await loadBackendState();
+                    } finally {
+                        suppressBackendStartupErrors = false;
+                    }
                 }
             } catch (error) {
-                backendError('Connecting to Supabase', error);
+                console.error('[Supabase] Startup session check failed', error);
+                currentSession = { role: null, userId: null, name: null };
+                showLogin();
             }
             supabaseClient.auth.onAuthStateChange((_event, session) => {
-                if (session && !currentSession.role) restoreBackendSession(session).catch(error => backendError('Restoring session', error));
+                if (session && !currentSession.role) {
+                    restoreBackendSession(session).catch(error => {
+                        console.error('[Supabase] Session restoration failed', error);
+                        currentSession = { role: null, userId: null, name: null };
+                        showLogin();
+                    });
+                }
             });
             setupCustomSignupSelects();
             setupSignupValidation();
