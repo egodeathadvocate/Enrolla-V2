@@ -210,7 +210,7 @@
         .card { background: var(--card-bg); border-radius: 20px; padding: 1.5rem; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; } .card-header h3 { font-size: 0.923rem; font-weight: 600; color: #1E293B; }
         .card-header a { font-size: 0.701rem; color: #6366F1; font-weight: 600; text-decoration: none; cursor: pointer; } .card-header a:hover { text-decoration: underline; }
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.641rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.641rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-align: center; line-height: 1.2; }
         .badge-enrolled { background: #D1FAE5; color: #065F46; }
         .badge-available { background: #E0E7FF; color: #3730A3; }
         .badge-core { background: #FEE2E2; color: #991B1B; }
@@ -257,18 +257,25 @@
             color: #64748B; font-weight: 500; font-size: 0.752rem;
         }
         .term-info .material-symbols-outlined { margin-right: 8px; vertical-align: middle; font-size: 18px; color: #6366F1; }
-        .quick-actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.2rem; }
-        .action-btn {
-            display: flex; align-items: center; gap: 14px; padding: 1.1rem; border-radius: 16px; border: none; cursor: pointer; text-align: left; transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .action-btn:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-        .action-btn .material-symbols-outlined { font-size: 28px; }
-        .action-btn h4 { font-size: 0.769rem; margin: 0; font-weight: 600; }
-        .action-btn p { font-size: 0.616rem; margin: 0; opacity: 0.75; }
-        .btn-blue { background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; }
-        .btn-purple { background: #F3E8FF; color: #9333EA; border: 1px solid #E9D5FF; }
-        .btn-teal { background: #E6FFFA; color: #0D9488; border: 1px solid #CCFBF1; }
-        .btn-yellow { background: #FEF9C3; color: #CA8A04; border: 1px solid #FEF08A; }
+        .quick-actions-card { position: relative; margin-bottom: 1.5rem; }
+        .quick-actions-bar { display: flex; align-items: center; gap: 0.65rem; min-height: 48px; padding: 0.55rem 0.65rem; border: 1px dashed #CBD5E1; border-radius: 12px; background: #F8FAFC; }
+        .quick-actions-list { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; min-width: 0; flex: 1; }
+        .quick-actions-empty { color: #94A3B8; font-size: 0.7rem; }
+        .quick-action-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #C7D2FE; border-radius: 9px; background: #FFFFFF; color: #4338CA; font: inherit; font-size: 0.69rem; font-weight: 600; cursor: pointer; transition: background-color 0.18s, border-color 0.18s, transform 0.18s; }
+        .quick-action-chip:hover { background: #EEF2FF; border-color: #A5B4FC; transform: translateY(-1px); }
+        .quick-action-chip .material-symbols-outlined { font-size: 17px; }
+        .quick-action-add { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; padding: 5px 11px 5px 5px; border: 0; border-radius: 999px; background: transparent; color: #64748B; font: inherit; font-size: 0.69rem; font-weight: 600; cursor: pointer; transition: background-color 0.18s, color 0.18s; }
+        .quick-action-add:hover, .quick-actions-picker.open + .quick-action-add { background: #EEF2FF; color: #4F46E5; }
+        .quick-action-add-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #E0E7FF; color: #4F46E5; }
+        .quick-action-add-icon .material-symbols-outlined { font-size: 19px; }
+        .quick-actions-picker { position: absolute; right: 0.75rem; top: calc(100% - 0.15rem); z-index: 20; width: min(300px, calc(100% - 1.5rem)); padding: 7px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14); opacity: 0; visibility: hidden; transform: translateY(-5px); transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease; }
+        .quick-actions-picker.open { opacity: 1; visibility: visible; transform: translateY(4px); }
+        .quick-actions-picker-title { padding: 5px 7px 7px; color: #64748B; font-size: 0.66rem; font-weight: 600; }
+        .quick-actions-option { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: #334155; font: inherit; text-align: left; cursor: pointer; }
+        .quick-actions-option:hover { background: #F8FAFC; color: #4F46E5; }
+        .quick-actions-option .material-symbols-outlined { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #EEF2FF; color: #6366F1; font-size: 17px; }
+        .quick-actions-option strong { display: block; font-size: 0.69rem; }
+        .quick-actions-option small { display: block; margin-top: 1px; color: #94A3B8; font-size: 0.61rem; }
 
         /* Special requests */
         .admin-table th[onclick]::after { content: " \21C5"; font-size: 0.85em; opacity: 0.55; }
@@ -312,12 +319,7 @@
         #dashboard .term-info .material-symbols-outlined { margin-right: 0; }
         #dashboard .term-info > span:last-child { text-align: right; }
 
-        /* Quick actions: heading now uses .card-header, so the grid needs no extra top margin. */
-        #dashboard .quick-actions-grid { margin-top: 0; }
-        #dashboard .action-btn > div { min-width: 0; }
-        @media (min-width: 769px) and (max-width: 1280px) {
-            #dashboard .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        #dashboard .quick-actions-card .card-header { margin-bottom: 0.65rem; }
         @media (max-width: 1180px) {
             #dashboard .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
         }
@@ -368,12 +370,13 @@
         }
         .filter-pill:hover { border-color: #6366F1; color: #6366F1; }
         .filter-pill.active { background: #6366F1; color: white; border-color: #6366F1; }
-        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.5rem; }
+        .catalog-grid { display: flex; flex-direction: column; gap: 0.65rem; }
         .catalog-card {
-            background: white; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 0.8rem 1rem; display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(270px, auto); grid-template-rows: auto auto; align-items: center; gap: 0.65rem 1rem;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; cursor: pointer;
         }
-        .catalog-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .catalog-card:hover { transform: translateX(3px); box-shadow: var(--shadow-md); border-color: #C7D2FE; }
+        .catalog-card > div { min-width: 0; }
         .admin-program-card {
           background: white; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
           transition: transform 0.2s, box-shadow 0.2s; animation: fadeIn 0.35s ease-out forwards;
@@ -391,16 +394,50 @@
         .admin-program-card .program-action-edit:hover { background: #E2E8F0; color: #1E293B; border-color: #CBD5E1; }
         .admin-program-card .program-action-delete { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
         .admin-program-card .program-action-delete:hover { background: #DC2626; color: white; border-color: #DC2626; }
-        .cat-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 0.85rem; }
-        .cat-title h3 { font-size: 0.898rem; color: #1E293B; margin-bottom: 0.25rem; }
-        .cat-meta-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem; }
-        .cat-desc { font-size: 0.735rem; color: #475569; margin-bottom: 1.2rem; line-height: 1.55; flex-grow: 1; }
+        .cat-subject { grid-column: 1; grid-row: 1; min-width: 0; }
+        .cat-header { display: block; margin-bottom: 0.35rem; }
+        .cat-title h3 { font-size: 0.88rem; color: #1E293B; margin-bottom: 0; line-height: 1.3; letter-spacing: 0.005em; }
+        .cat-meta-badges { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 5px; }
+        .cat-desc { display: none; }
         .cat-schedule-box {
-            background: #F8FAFC; padding: 8px 12px; border-radius: 10px; font-size: 0.667rem; color: #334155; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px;
-            border: 1px solid #F1F5F9;
+            background: #F8FAFC; padding: 8px 11px; border-radius: 9px; font-size: 0.7rem; line-height: 1.35; color: #334155; display: flex; align-items: center; gap: 7px; border: 1px solid #F1F5F9; min-height: 34px;
         }
-        .cat-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F1F5F9; padding-top: 1rem; gap: 8px; }
-        .cat-units { font-weight: 600; color: #6366F1; background: #EEF2FF; padding: 4px 12px; border-radius: 8px; font-size: 0.684rem; white-space: nowrap; }
+        .cat-footer { grid-column: 3; grid-row: 1; display: flex; justify-content: space-between; align-items: center; gap: 10px; min-width: 0; }
+        .cat-footer > span { font-size: 0.7rem !important; line-height: 1.3; }
+        .cat-footer .cat-action { font-size: 0.68rem !important; padding: 7px 11px !important; }
+        .cat-units { grid-column: 2; grid-row: 1; justify-self: center; min-width: 62px; min-height: 22px; display: inline-flex; align-items: center; justify-content: center; text-align: center; font-weight: 600; color: #6366F1; background: #EEF2FF; padding: 3px 7px; border-radius: 7px; font-size: 0.64rem; line-height: 1.1; white-space: nowrap; }
+        .cat-schedule-box { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
+        .catalog-card .cat-action { cursor: pointer; }
+        .schedule-more-btn { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 22px; width: 22px; height: 22px; margin-left: auto; border: 1px solid #CBD5E1; border-radius: 6px; background: #E2E8F0; color: #64748B; font-size: 16px; font-weight: 600; line-height: 1; cursor: pointer; }
+        .schedule-more-btn:hover, .schedule-more-btn[aria-expanded="true"] { background: #CBD5E1; color: #334155; }
+        .conflict-schedules { display: block; grid-column: 1 / -1; max-height: 0; overflow: hidden; opacity: 0; padding: 0 0.7rem; border-top: 1px dashed transparent; color: #94A3B8; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, border-color 0.28s ease; }
+        .conflict-schedules.open { max-height: 520px; opacity: 1; padding: 0.7rem; border-top-color: #CBD5E1; }
+        .conflict-schedules-head { display: flex; align-items: center; gap: 7px; margin-bottom: 0.55rem; color: #64748B; }
+        .conflict-schedules-title { font-size: 0.68rem; font-weight: 600; }
+        .conflict-schedules-search { width: 100%; padding: 7px 10px 7px 30px; border: 1px solid #E2E8F0; border-radius: 8px; background: #FFFFFF; color: #334155; font: inherit; font-size: 0.65rem; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 10px center; }
+        .conflict-schedules-search:focus { border-color: #C7D2FE; box-shadow: 0 0 0 3px #EEF2FF; }
+        .conflict-schedule-list { display: flex; flex-direction: column; gap: 5px; }
+        .conflict-schedule-row { display: grid; grid-template-columns: 22px minmax(150px, 1fr) minmax(190px, 1.2fr) minmax(150px, 0.9fr); align-items: center; gap: 8px; padding: 0.5rem 0.6rem; border: 1px solid #E2E8F0; border-radius: 8px; background: #F8FAFC; font-size: 0.64rem; color: #94A3B8; }
+        .conflict-schedule-row strong { color: #64748B; }
+        .conflict-schedule-row .conflict-detail { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .conflict-schedule-row .conflict-label { font-size: 0.57rem; color: #A8B3C2; text-transform: uppercase; letter-spacing: 0.04em; }
+        .conflict-empty { padding: 0.5rem; border: 1px dashed #CBD5E1; border-radius: 8px; font-size: 0.64rem; color: #94A3B8; text-align: center; }
+        @media (min-width: 1100px) {
+            .catalog-grid { gap: 0.75rem; }
+            .catalog-card { grid-template-columns: minmax(0, 1fr) 90px minmax(300px, auto); padding: 0.95rem 1.25rem; gap: 0.75rem 1.5rem; }
+            .cat-title h3 { font-size: 0.94rem; }
+            .cat-schedule-box { white-space: nowrap; padding: 9px 12px; }
+            .cat-footer { justify-content: space-between; }
+        }
+        @media (max-width: 760px) {
+           .catalog-card { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto; gap: 0.5rem 0.75rem; }
+           .cat-subject { grid-column: 1; grid-row: 1; }
+           .cat-units { grid-column: 2; grid-row: 1; }
+           .cat-footer { grid-column: 1 / -1; grid-row: 2; justify-content: flex-end; }
+           .cat-schedule-box { grid-column: 1 / -1; grid-row: 3; white-space: normal; }
+           .conflict-schedule-row { grid-template-columns: 22px 1fr; }
+           .conflict-schedule-row .conflict-detail { grid-column: 2; }
+        }
 
         /* SCHEDULE PAGE */
         .schedule-summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
@@ -915,6 +952,19 @@
               </div>
             </div>
           </div>
+          <div class="card quick-actions-card">
+            <div class="card-header"><h3>Quick Actions</h3></div>
+            <div class="quick-actions-bar">
+              <div class="quick-actions-list" id="quick-actions-list">
+                <span class="quick-actions-empty">No quick actions added yet.</span>
+              </div>
+              <button class="quick-action-add" type="button" aria-expanded="false" onclick="toggleQuickActionPicker(event)">
+                <span class="quick-action-add-icon"><span class="material-symbols-outlined">add</span></span>
+                <span>Add a quick action</span>
+              </button>
+            </div>
+            <div class="quick-actions-picker" id="quick-actions-picker" role="menu" aria-label="Add a quick action"></div>
+          </div>
           <div class="dashboard-grid">
             <div class="dash-col">
               <div class="card">
@@ -959,19 +1009,6 @@
                   <span style="color:#065F46; font-weight:600;" id="dash-clearance-summary">None (Allowed to Enroll)</span>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="card" style="margin-top: 1.5rem;">
-            <div class="card-header"><h3>Quick Actions</h3></div>
-            <div class="quick-actions-grid">
-              <button class="action-btn btn-blue" onclick="navigateTo('subjects')"> <span class="material-symbols-outlined">menu_book</span> <div><h4>Browse Subjects</h4><p>View course catalog</p></div> </button>
-              <button class="action-btn btn-purple" onclick="navigateTo('enrollment')">
-                <span class="material-symbols-outlined">edit_document</span>
-                <div><h4>Enroll in Subjects</h4><p>Add or drop units</p></div>
-              </button>
-              <button class="action-btn btn-teal" onclick="navigateTo('profile')"> <span class="material-symbols-outlined">person</span> <div><h4>View Profile</h4><p>Manage personal data</p></div> </button>
-              <button class="action-btn btn-blue" onclick="navigateTo('requests')"> <span class="material-symbols-outlined">contact_support</span> <div><h4>Special Request</h4><p>Ask for an exception</p></div> </button>
-              <button class="action-btn btn-yellow" onclick="navigateTo('schedule')"> <span class="material-symbols-outlined">calendar_month</span> <div><h4>View Schedule</h4><p>See weekly timetable</p></div> </button>
             </div>
           </div>
         </div>
@@ -1230,7 +1267,7 @@
           <div class="header">
             <div>
               <h1><span class="material-symbols-outlined" style="color: #6366F1; font-size: 2.2rem; background: #EEF2FF; padding: 10px; border-radius: 14px;">support_agent</span> Special Requests</h1>
-              <p style="color: var(--text-muted); font-size: 0.769rem; margin-top: 2px;">Ask the Registrar for an exception, such as late enrollment, a unit overload, or a schedule or capacity override.</p>
+              <p style="color: var(--text-muted); font-size: 0.769rem; margin-top: 2px;">Submit a request for Registrar approval before dropping a subject or asking for an enrollment exception.</p>
             </div>
           </div>
           <div class="req-layout">
@@ -1535,7 +1572,7 @@
                 <div style="padding:12px 14px; border:1px solid var(--gray-200); border-radius:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
                   <div>
                     <span class="status-pill pill-open">Open</span>
-                    <p style="font-size:0.684rem; color:var(--gray-600); margin-top:4px;">Students can self-enroll and drop subjects freely within capacity limits.</p>
+                    <p style="font-size:0.684rem; color:var(--gray-600); margin-top:4px;">Students can self-enroll within capacity limits. Subject drops always require Registrar approval.</p>
                   </div>
                   <button class="admin-btn admin-btn-sm admin-btn-outline" onclick="simulatePeriodPreset('Open')">Simulate Open</button>
                 </div>
@@ -1569,7 +1606,7 @@
             <div class="admin-panel-header">
               <div>
                 <h3><span class="material-symbols-outlined" style="color:var(--navy-600);">support_agent</span> Special Requests</h3>
-                <p style="font-size:0.701rem; color:var(--gray-600);">Review student exception requests: late enrollment, unit overload, schedule conflict and full-subject overrides.</p>
+                <p style="font-size:0.701rem; color:var(--gray-600);">Review student requests, including subject drop approvals, late enrollment, unit overload, schedule conflict and full-subject overrides.</p>
               </div>
             </div>
             <div class="admin-toolbar">
@@ -2996,6 +3033,69 @@
             closeModal('forgot-modal');
             showToast(`Password reset instructions sent to ${val}`, 'success');
         }
+        const QUICK_ACTION_OPTIONS = [
+            { id: 'subjects', label: 'Browse Subjects', description: 'Go directly to the subject catalog', icon: 'menu_book', target: 'subjects' },
+            { id: 'schedule', label: 'View Other Schedules', description: 'Compare available class schedules', icon: 'calendar_month', target: 'schedule' }
+        ];
+        function getQuickActionsKey() {
+            return `enrolla_quick_actions_${currentSession.userId || 'guest'}`;
+        }
+        function getQuickActions() {
+            try {
+                const stored = JSON.parse(safeGetItem(getQuickActionsKey()) || '[]');
+                return Array.isArray(stored) ? stored.filter(id => QUICK_ACTION_OPTIONS.some(option => option.id === id)) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+        function renderQuickActions() {
+            const list = byId('quick-actions-list');
+            const picker = byId('quick-actions-picker');
+            if (!list || !picker) return;
+            const selected = getQuickActions();
+            const options = QUICK_ACTION_OPTIONS.filter(option => !selected.includes(option.id));
+            list.innerHTML = selected.length ? selected.map(id => {
+                const option = QUICK_ACTION_OPTIONS.find(item => item.id === id);
+                return `<button class="quick-action-chip" type="button" onclick="runQuickAction('${option.id}')"><span class="material-symbols-outlined">${option.icon}</span>${option.label}</button>`;
+            }).join('') : '<span class="quick-actions-empty">No quick actions added yet.</span>';
+            picker.innerHTML = `<div class="quick-actions-picker-title">Choose a shortcut</div>${options.length ? options.map(option => `
+                <button class="quick-actions-option" type="button" role="menuitem" onclick="addQuickAction('${option.id}')">
+                    <span class="material-symbols-outlined">${option.icon}</span>
+                    <span><strong>${option.label}</strong><small>${option.description}</small></span>
+                </button>`).join('') : '<div class="quick-actions-picker-title">All quick actions are already added.</div>'}`;
+        }
+        function toggleQuickActionPicker(event) {
+            event?.stopPropagation();
+            const picker = byId('quick-actions-picker');
+            const button = document.querySelector('.quick-action-add');
+            if (!picker || !button) return;
+            const isOpen = picker.classList.toggle('open');
+            button.setAttribute('aria-expanded', String(isOpen));
+            if (isOpen) renderQuickActions();
+        }
+        function addQuickAction(actionId) {
+            const option = QUICK_ACTION_OPTIONS.find(item => item.id === actionId);
+            if (!option) return;
+            const selected = getQuickActions();
+            if (!selected.includes(actionId)) {
+                selected.push(actionId);
+                safeSetItem(getQuickActionsKey(), JSON.stringify(selected));
+            }
+            renderQuickActions();
+            byId('quick-actions-picker')?.classList.remove('open');
+            document.querySelector('.quick-action-add')?.setAttribute('aria-expanded', 'false');
+            showToast(`${option.label} added to Quick Actions.`, 'success');
+        }
+        function runQuickAction(actionId) {
+            const option = QUICK_ACTION_OPTIONS.find(item => item.id === actionId);
+            if (!option) return;
+            byId('quick-actions-picker')?.classList.remove('open');
+            document.querySelector('.quick-action-add')?.setAttribute('aria-expanded', 'false');
+            navigateTo(option.target);
+        }
+        window.toggleQuickActionPicker = toggleQuickActionPicker;
+        window.addQuickAction = addQuickAction;
+        window.runQuickAction = runQuickAction;
         function navigateTo(targetId) {
             document.querySelectorAll('.nav-menu li').forEach(item => {
                 if (item.getAttribute('data-target') === targetId) item.classList.add('active'); else item.classList.remove('active');
@@ -3052,7 +3152,7 @@
                 if (effectiveStatus === 'Open') {
                     bannerEl.className = 'alert-banner alert-success';
                     bannerIcon.innerText = 'verified_user';
-                    bannerText.innerHTML = `<strong>Enrollment is Open (${enrollmentSettings.academicYear} • ${enrollmentSettings.semester}):</strong> You may enroll in or drop subjects within capacity limits.`;
+                    bannerText.innerHTML = `<strong>Enrollment is Open (${enrollmentSettings.academicYear} • ${enrollmentSettings.semester}):</strong> You may enroll in subjects within capacity limits. Subject drops require Registrar approval.`;
                     bannerBadge.className = 'badge badge-enrolled';
                     bannerBadge.innerText = 'Open';
                 } else if (effectiveStatus === 'Scheduled') {
@@ -3132,8 +3232,8 @@
                     <span class="badge ${badgeClass}">${course.programCode ||
                     'BSIT'} • ${course.type}</span> </div> <p>
                     <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> ${course.details} • <strong>${course.room}</strong> </p> </div>
-                    <button class="btn-action btn-drop" onclick="toggleCourse('${course.id}')" ${!isEnrollmentOpen ? 'style="opacity:0.5;"' :
-                    ''}> Drop Unit </button> </div>`;
+                    <button class="btn-action btn-drop" onclick="startDropRequest('${course.id}')" ${!isEnrollmentOpen ? 'style="opacity:0.5;"' :
+                    ''}> Request Drop </button> </div>`;
             });
             const fillPercentage = Math.min(100, (currentUnits / maxUnits) * 100);
             byId('unit-progress').style.width = `${fillPercentage}%`;
@@ -3143,6 +3243,7 @@
             byId('dash-total-units').innerText = currentUnits;
             byId('dash-subjects-count').innerText = `${enrolledCourses.length} subjects currently enrolled (${totalWeeklyHours} hrs/wk)`;
             byId('dash-load-status').innerText = currentUnits >= 15 ? 'Full Regular Load' : (currentUnits > 0 ? 'Partial Load' : 'No Load');
+            renderQuickActions();
             const dashDotList = byId('dash-dot-list');
             const dashSubList = byId('dash-subject-list');
             dashDotList.innerHTML = '';
@@ -3182,7 +3283,7 @@
             const sid = currentSession.userId;
             const grants = getStudentGrants(sid);
             const effectiveStatus = getEffectiveEnrollmentStatus();
-            if (effectiveStatus !== 'Open' && !grants.late) {
+            if (course.status === 'available' && effectiveStatus !== 'Open' && !grants.late) {
                 showToast(`Enrollment is currently ${effectiveStatus}. You cannot modify subjects outside the enrollment period. You may file a Special Request (Late Enrollment).`,
                     'error');
                 return;
@@ -3229,14 +3330,8 @@
                     `Student ${sid} enrolled in ${course.code}${effectiveStatus !== 'Open' ? ' (late enrollment approved by special request)' :
                     ''}.`);
             } else {
-                course.status = 'available';
-                course.enrolledCount = Math.max(0, course.enrolledCount - 1);
-                const existingEnr = enrollments.find(e => e.studentId === sid && e.subjectCode.toUpperCase() === course.code.toUpperCase() &&
-                    e.status === 'Approved');
-                if (existingEnr) { existingEnr.status = 'Cancelled'; }
-                showToast(`Dropped ${course.title}`, 'info');
-                addNotification('remove_circle_outline', `Dropped ${course.title} from study load`, 'enrollment');
-                logAdminAction('Enrollment', 'STUDENT_SELF_DROP', `Student ${sid} dropped ${course.code}.`);
+                startDropRequest(course.id);
+                return;
             }
             updateAllViews();
         };
@@ -3271,6 +3366,55 @@
             });
             renderCatalog();
         }
+        function schedulesOverlap(first, second) {
+            if (!first || !second || first.id === second.id) return false;
+            if (!first.days?.some(day => second.days?.includes(day))) return false;
+            const firstEnd = first.startHour + first.duration;
+            const secondEnd = second.startHour + second.duration;
+            return first.startHour < secondEnd && firstEnd > second.startHour;
+        }
+        function getConflictingSchedules(course) {
+            const enrolled = courses.filter(item => item.status === 'enrolled' && item.id !== course.id);
+            const available = courses.filter(item => item.status !== 'enrolled' && item.id !== course.id);
+            const pool = course.status === 'enrolled' ? available : enrolled;
+            return pool.filter(item => schedulesOverlap(course, item));
+        }
+        function getCourseBuilding(course) {
+            if (course.building) return course.building;
+            const room = (course.room || '').toLowerCase();
+            if (room.includes('gym')) return 'University Sports Complex';
+            if (room.includes('lab') || room.includes('cisco') || room.includes('design')) return 'College of Computing Building';
+            return 'Main Academic Building';
+        }
+        function renderConflictScheduleList(courseId, query = '') {
+            const course = courses.find(item => item.id === courseId);
+            const list = byId(`conflict-list-${courseId}`);
+            if (!course || !list) return;
+            const normalizedQuery = query.trim().toLowerCase();
+            const matches = getConflictingSchedules(course).filter(item => {
+                const haystack = `${item.code} ${item.name} ${item.scheduleText} ${getCourseBuilding(item)} ${item.room}`.toLowerCase();
+                return !normalizedQuery || haystack.includes(normalizedQuery);
+            });
+            list.innerHTML = matches.length ? matches.map(item => `<div class="conflict-schedule-row">
+                <span class="material-symbols-outlined" style="font-size:15px; color:#94A3B8;">event_busy</span>
+                <div class="conflict-detail"><span class="conflict-label">Class</span><strong>${escapeHtml(item.code)} - ${escapeHtml(item.name)}</strong></div>
+                <div class="conflict-detail"><span class="conflict-label">Schedule</span><span>${escapeHtml(item.scheduleText)}</span></div>
+                <div class="conflict-detail"><span class="conflict-label">Building / Room</span><span>${escapeHtml(getCourseBuilding(item))} • ${escapeHtml(item.room)}</span></div>
+            </div>`).join('') : '<div class="conflict-empty">No conflicting class schedules found.</div>';
+        }
+        function toggleConflictSchedules(courseId, button) {
+            const panel = byId(`conflicts-${courseId}`);
+            if (!panel) return;
+            const isOpen = panel.classList.toggle('open');
+            button.setAttribute('aria-expanded', String(isOpen));
+            button.innerText = isOpen ? '−' : '+';
+            if (isOpen) {
+                const search = panel.querySelector('.conflict-schedules-search');
+                renderConflictScheduleList(courseId, search?.value || '');
+                search?.focus();
+            }
+        }
+        window.toggleConflictSchedules = toggleConflictSchedules;
         function renderCatalog() {
             const catalog = byId('catalog-list');
             const query = (byId('catalog-search')?.value || '').toLowerCase().trim();
@@ -3289,19 +3433,27 @@
                 const isEnrolled = c.status === 'enrolled';
                 const isFull = c.enrolledCount >= c.maxCapacity;
                 const badgeClass = getTypeBadgeClass(c.type);
-                catalog.innerHTML += ` <div class="catalog-card"> <div> <div class="cat-header"> <div class="cat-title"> <h3>${c.title}</h3> </div> <span class="cat-units">${c.units} Units</span>
-                    </div> <div class="cat-meta-badges"> <span class="badge ${badgeClass}">${c.programCode ||
-                    'BSIT'} • ${c.type}</span> <span class="badge ${isEnrolled ? 'badge-enrolled' : (isFull ? 'badge-core' :
-                    'badge-available')}"> ${isEnrolled ? 'Enrolled' : (isFull ? 'Full (' + c.enrolledCount + '/' + c.maxCapacity + ')' :
-                    'Available (' + c.enrolledCount + '/' + c.maxCapacity +
-                    ')')} </span> </div> <div class="cat-desc">${c.desc}</div> <div class="cat-schedule-box">
-                    <span class="material-symbols-outlined" style="font-size:16px; color:#6366F1;">schedule</span> <span>${c.scheduleText} • <strong>${c.room}</strong></span> </div> </div>
-                    <div class="cat-footer"> <span style="font-size: 0.684rem; color: var(--text-muted); font-weight:500;">
-                    <span class="material-symbols-outlined" style="font-size:15px; vertical-align:middle;">person</span> ${c.instructor} </span> <div style="display:flex; gap:6px;">
-                    <button class="btn-action" style="background:#F1F5F9; color:#334155; padding: 6px 12px; font-size:0.667rem;" onclick="openCourseModal('${c.id}')">Syllabus</button>
-                    <button class="btn-action ${isEnrolled ? 'btn-drop' :
-                    'btn-enroll'}" onclick="toggleCourse('${c.id}')" style="padding: 6px 14px; font-size:0.667rem;"> ${isEnrolled ? 'Drop' : (isFull ?
-                    'Full' : 'Enroll')} </button> </div> </div> </div> `;
+                catalog.innerHTML += ` <div class="catalog-card" onclick="openCourseModal('${c.id}')">
+                    <div class="cat-subject">
+                        <div class="cat-header"><div class="cat-title"><h3>${c.title}</h3></div></div>
+                        <div class="cat-meta-badges"><span class="badge ${badgeClass}">${c.programCode || 'BSIT'} • ${c.type}</span>
+                        <span class="badge ${isEnrolled ? 'badge-enrolled' : (isFull ? 'badge-core' : 'badge-available')}">${isEnrolled ? 'Enrolled' :
+                    (isFull ? 'Full (' + c.enrolledCount + '/' + c.maxCapacity + ')' : 'Available (' + c.enrolledCount + '/' + c.maxCapacity + ')')}</span></div>
+                    </div>
+                    <span class="cat-units">${c.units} Units</span>
+                    <div class="cat-schedule-box"><span class="material-symbols-outlined" style="font-size:16px; color:#6366F1;">schedule</span>
+                    <span>${c.scheduleText} • <strong>${c.room}</strong></span>
+                    <button class="schedule-more-btn" aria-label="Show conflicting schedules" aria-expanded="false" onclick="event.stopPropagation(); toggleConflictSchedules('${c.id}', this)">+</button></div>
+                    <div id="conflicts-${c.id}" class="conflict-schedules" onclick="event.stopPropagation()">
+                    <div class="conflict-schedules-head"><span class="material-symbols-outlined" style="font-size:17px;">calendar_view_week</span><span class="conflict-schedules-title">Other class schedules</span></div>
+                    <input class="conflict-schedules-search" type="search" aria-label="Search other class schedules" placeholder="Search class, schedule, building, or room..." oninput="renderConflictScheduleList('${c.id}', this.value)">
+                    <div id="conflict-list-${c.id}" class="conflict-schedule-list"></div></div>
+                    <div class="cat-footer"><span style="font-size:0.66rem; color:var(--text-muted); font-weight:500;">
+                    <span class="material-symbols-outlined" style="font-size:15px; vertical-align:middle;">person</span> ${c.instructor}</span>
+                    <div style="display:flex; gap:6px;">
+                    <button class="cat-action btn-action" style="background:#F1F5F9; color:#334155; padding:6px 10px; font-size:0.64rem;" onclick="event.stopPropagation(); openCourseModal('${c.id}')">Details</button>
+                    <button class="cat-action btn-action ${isEnrolled ? 'btn-drop' : 'btn-enroll'}" onclick="event.stopPropagation(); ${isEnrolled ? `startDropRequest('${c.id}')` : `toggleCourse('${c.id}')`}" style="padding:6px 10px; font-size:0.64rem;">${isEnrolled ? 'Request Drop' : (isFull ? 'Full' : 'Enroll')}</button>
+                    </div></div></div> `;
             });
         }
 
@@ -4525,6 +4677,11 @@
 
         // SPECIAL REQUESTS (student form + admin review)
         const REQUEST_TYPES = {
+            'Subject Drop Request': {
+                subject: true,
+                units: false,
+                hint: 'Dropping a subject requires Registrar approval. Your study load will stay unchanged until the request is approved.'
+            },
             'Late Enrollment': {
                 subject: false,
                 units: false,
@@ -4560,6 +4717,12 @@
             if (r.subjectCode) return `Subject: ${r.subjectCode}`;
             return 'General request';
         }
+        function getStudentEnrolledCourses(studentId = currentSession.userId) {
+            const approvedCodes = new Set(enrollments
+                .filter(e => e.studentId === studentId && e.status === 'Approved')
+                .map(e => e.subjectCode.toUpperCase()));
+            return courses.filter(c => approvedCodes.has(c.code.toUpperCase()));
+        }
         function onRequestTypeChange() {
             const type = byId('req-type').value;
             const cfg = REQUEST_TYPES[type];
@@ -4568,16 +4731,36 @@
             byId('req-units-wrap').style.display = cfg.units ? '' : 'none';
             if (cfg.subject) {
                 const sel = byId('req-subject');
-                sel.innerHTML = courses.filter(c => c.status === 'available').map(c => {
+                const subjectOptions = type === 'Subject Drop Request' ? getStudentEnrolledCourses() : courses.filter(c => c.status === 'available');
+                sel.innerHTML = subjectOptions.map(c => {
                     const tags = [];
-                    if (c.enrolledCount >= c.maxCapacity) tags.push('FULL');
-                    const cf = findScheduleConflict(c);
-                    if (cf) tags.push('conflicts with ' + cf.code);
+                    if (type !== 'Subject Drop Request') {
+                        if (c.enrolledCount >= c.maxCapacity) tags.push('FULL');
+                        const cf = findScheduleConflict(c);
+                        if (cf) tags.push('conflicts with ' + cf.code);
+                    } else {
+                        tags.push(`${c.units} units`);
+                    }
                     return `<option value="${escapeHtml(c.code)}">${escapeHtml(c.title)}${tags.length ? ' (' + tags.join(', ') + ')' : ''}</option>`;
                 }).join('');
+                if (!subjectOptions.length) {
+                    sel.innerHTML = '<option value="">No enrolled subjects available</option>';
+                }
             }
         }
         window.onRequestTypeChange = onRequestTypeChange;
+        function startDropRequest(courseId) {
+            if (currentSession.role !== 'student') return;
+            const course = courses.find(c => c.id === courseId);
+            if (!course || course.status !== 'enrolled') return;
+            navigateTo('requests');
+            byId('req-type').value = 'Subject Drop Request';
+            onRequestTypeChange();
+            byId('req-subject').value = course.code;
+            byId('req-reason').focus();
+            showToast(`Drop request started for ${course.code}. Add your reason and submit it for Registrar approval.`, 'info');
+        }
+        window.startDropRequest = startDropRequest;
         function renderStudentRequests() {
             const list = byId('my-requests-list');
             const typeSel = byId('req-type');
@@ -4628,6 +4811,10 @@
                 subjectCode = byId('req-subject').value;
                 const course = courses.find(c => c.code === subjectCode);
                 if (!course) { showToast('Please choose a subject.', 'warning'); return; }
+                if (type === 'Subject Drop Request' && !getStudentEnrolledCourses(sid).some(c => c.code === subjectCode)) {
+                    showToast('You can only request a drop for a subject currently in your study load.', 'warning');
+                    return;
+                }
                 if (type === 'Full Subject Override' && course.enrolledCount < course.maxCapacity) {
                     showToast(`${subjectCode} still has open slots. You can enroll in it directly.`, 'info');
                     return;
@@ -4659,7 +4846,7 @@
             };
             specialRequests.unshift(req);
             logAdminAction('Requests', 'SUBMIT_REQUEST', `Student ${sid} submitted ${req.id} (${type}${subjectCode ? ' - ' + subjectCode : ''}).`);
-            addNotification('contact_support', `Special request ${req.id} (${type}) was submitted.`, 'requests');
+            addNotification('contact_support', `${type} ${req.id} was submitted for Registrar approval.`, 'requests');
             byId('req-reason').value = '';
             saveState();
             renderStudentRequests();
@@ -4737,14 +4924,27 @@
                 showToast('Please add a remark explaining why the request is rejected.', 'warning');
                 return;
             }
-            r.status = approved ? 'Approved' : 'Rejected';
             r.adminRemark = remark;
             r.decidedBy = currentSession.userId;
             r.decidedAt = new Date().toISOString().replace('T', ' ').substring(0, 16);
+            if (approved && r.type === 'Subject Drop Request') {
+                const enrollment = enrollments.find(e => e.studentId === r.studentId &&
+                    e.subjectCode.toUpperCase() === r.subjectCode.toUpperCase() && e.status === 'Approved');
+                const course = courses.find(c => c.code.toUpperCase() === r.subjectCode.toUpperCase());
+                if (!enrollment || !course) {
+                    showToast(`Unable to approve ${r.id}: ${r.subjectCode} is no longer in the student's active study load.`, 'error');
+                    return;
+                }
+                enrollment.status = 'Cancelled';
+                course.enrolledCount = Math.max(0, course.enrolledCount - 1);
+                logAdminAction('Enrollment', 'APPROVE_SUBJECT_DROP',
+                    `Approved ${r.id}; removed ${r.subjectCode} from student ${r.studentId}'s study load.`);
+            }
             if (approved && r.type === 'Late Enrollment') {
                 const days = parseInt(byId('req-days').value, 10) || 7;
                 r.expiresAt = new Date(Date.now() + days * 86400000).toISOString();
             }
+            r.status = approved ? 'Approved' : 'Rejected';
             const nice = approved ? 'approved' : 'rejected';
             pushStudentNotification(r.studentId, approved ? 'check_circle' : 'cancel',
                 `Your special request ${r.id} (${r.type}) was ${nice}.${remark ? ' Remarks: ' + remark : ''}`, 'requests');
@@ -4761,6 +4961,11 @@
         window.addEventListener('click', function(e) {
             if (!e.target.closest('.notification-wrapper')) { const nd = byId('notif-dropdown'); if (nd) nd.style.display = 'none'; }
             if (!e.target.closest('.user-widget')) { const um = byId('user-menu-popup'); if (um) um.style.display = 'none'; }
+            if (!e.target.closest('.quick-actions-card')) {
+                const picker = byId('quick-actions-picker');
+                if (picker) picker.classList.remove('open');
+                document.querySelector('.quick-action-add')?.setAttribute('aria-expanded', 'false');
+            }
             if (e.target.classList.contains('modal-backdrop')) { e.target.classList.remove('open'); }
         });
 
