@@ -145,8 +145,12 @@ create table if not exists public.notifications (
   text text not null,
   target text,
   unread boolean not null default true,
-  created_at timestamptz not null default timezone('utc', now())
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.notifications
+  add column if not exists updated_at timestamptz not null default timezone('utc', now());
 
 create index if not exists notifications_profile_idx on public.notifications(profile_id, created_at desc);
 

@@ -2008,6 +2008,8 @@
         let signupSubmitting = false;
         let signupCooldownTimer = null;
         let suppressBackendStartupErrors = false;
+        let backendErrorBurstAt = 0;
+        let backendErrorBurstShown = false;
 
         // Safe Storage Helpers (Prevents SecurityError in sandboxed iframes or file:// contexts)
         function safeGetItem(key) {
@@ -2038,6 +2040,13 @@
         function backendError(context, error) {
             console.error(`[Supabase] ${context}`, error);
             if (suppressBackendStartupErrors) return;
+            const now = Date.now();
+            if (now - backendErrorBurstAt > 5000) {
+                backendErrorBurstAt = now;
+                backendErrorBurstShown = false;
+            }
+            if (backendErrorBurstShown) return;
+            backendErrorBurstShown = true;
             showToast(`${context} failed. Please try again.`, 'error');
         }
         async function supabaseQuery(query, context) {
@@ -5533,10 +5542,10 @@
 
         // Initialize state on load
         async function initializeApplication() {
+            if (ENABLE_DEMO_ACCOUNTS) byId('demo-account-actions').style.display = 'flex';
             if (!BACKEND_MODE) {
                 showDemoModeBanner();
                 loadState();
-                if (ENABLE_DEMO_ACCOUNTS) byId('demo-account-actions').style.display = 'flex';
                 setupCustomSignupSelects();
                 setupSignupValidation();
                 return;
@@ -5545,7 +5554,6 @@
                 const { data } = await supabaseClient.auth.getSession();
                 if (data.session) await restoreBackendSession(data.session);
                 else {
-                    byId('demo-account-actions').style.display = ENABLE_DEMO_ACCOUNTS ? 'flex' : 'none';
                     suppressBackendStartupErrors = true;
                     try {
                         await loadBackendState();
