@@ -2507,6 +2507,7 @@
                 supabaseQuery(supabaseClient.from('profiles').select('*'), 'Loading profiles')
             ]);
             programs = (programRows || []).map(p => ({ ...p, subjectCodes: p.subject_codes || [] }));
+            if (!programs.length) programs = JSON.parse(JSON.stringify(DEFAULT_PROGRAMS));
             courses = (courseRows || []).map(c => ({
                 ...c, id: c.id, code: c.code, name: c.name, title: c.title || `${c.code} - ${c.name}`,
                 desc: c.description || c.desc || '', programCode: c.program_code, maxCapacity: c.max_capacity,
@@ -2964,7 +2965,8 @@
         function populateSignupPrograms() {
             const sel = byId('su-program');
           if (sel) {
-            sel.innerHTML = programs.map(p => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.code)} - ${escapeHtml(p.name)}</option>`).join('');
+            const availablePrograms = programs.length ? programs : DEFAULT_PROGRAMS;
+            sel.innerHTML = availablePrograms.map(p => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.code)} - ${escapeHtml(p.name)}</option>`).join('');
             renderCustomSelect('su-program');
           }
         }
