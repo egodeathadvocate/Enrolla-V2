@@ -98,7 +98,9 @@
         .auth-form-side .form-group input.password-valid { border-color: #10B981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16); }
         .auth-form-side .form-group input.password-invalid { border-color: #EF4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14); }
         .auth-form-side .form-group input.has-password-status { padding-right: 2.8rem; }
-        .auth-form-side .forgot-pass { display: block; float: none; text-align: right; font-size: 0.72rem; font-weight: 600; margin: 0.6rem 0.7rem 0 0; }
+        .auth-password-label-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 12px; }
+        .auth-password-label-row label { margin: 0 !important; }
+        .auth-form-side .forgot-pass { display: inline-block; font-size: 0.72rem; font-weight: 600; margin: 0; white-space: nowrap; }
         .login-btn {
             width: 100%; height: 46px; border: none; border-radius: 999px; background: #6C74F2; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 1.1rem;
             transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
@@ -113,6 +115,9 @@
         #signup-view .auth-wrap { flex-direction: column; gap: 1.6rem; }
         #signup-view .auth-form-side { width: 560px; }
         #signup-view .enrolla-logo { width: 200px; }
+        .auth-back-link { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; border: 0; padding: 0; margin-bottom: 1rem; background: transparent; color: #64748B; font: inherit; font-size: 0.75rem; cursor: pointer; }
+        .auth-back-link:hover { color: #4F46E5; }
+        .demo-preview-notice { display: none; position: fixed; top: 14px; left: 50%; z-index: 600; transform: translateX(-50%); padding: 7px 12px; border: 1px solid #FCD34D; border-radius: 999px; background: rgba(255,251,235,.96); color: #92400E; font-size: .72rem; font-weight: 600; box-shadow: 0 5px 16px rgba(146,64,14,.12); }
         .auth-seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; background: #EFEFF5; border-radius: 999px; padding: 4px; margin-bottom: 1.3rem; }
         .auth-seg button { border: none; background: transparent; height: 38px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #7B7B88; cursor: pointer; transition: all 0.2s; }
         .auth-seg button.active { background: #FFFFFF; color: #6C74F2; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
@@ -845,9 +850,8 @@
           <form id="login-form" style="width: 100%;" onsubmit="handleLoginSubmit(event)">
             <div class="form-group"><label for="login-id">Username / ID Number</label> <input type="text" id="login-id" autocomplete="username" required></div>
             <div class="form-group">
-              <label for="login-pass">Password</label>
+              <div class="auth-password-label-row"><label for="login-pass">Password</label><a class="forgot-pass" onclick="openModal('forgot-modal')">Forgot password?</a></div>
               <input type="password" id="login-pass" autocomplete="current-password" required>
-              <a class="forgot-pass" onclick="openModal('forgot-modal')">Forgot password?</a>
             </div>
             <button type="submit" class="login-btn" id="login-submit-btn">Log In</button>
           </form>
@@ -865,6 +869,7 @@
       <div class="auth-wrap">
         <div class="auth-logo-side"><svg class="enrolla-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg></div>
         <div class="auth-form-side">
+          <button type="button" class="auth-back-link" onclick="showLogin()"><span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>Back to login</button>
           <h2>Create your Account</h2>
           <div class="auth-notice auth-error" id="signup-error" style="display:none;"></div>
           <div class="auth-seg" role="tablist">
@@ -880,7 +885,7 @@
             </div>
             <div class="auth-grid" id="su-student-fields">
               <div class="form-group"><label for="su-id">Student ID (leave blank to auto-generate)</label><input type="text" id="su-id" inputmode="numeric" placeholder="e.g. 20261234"><span class="auth-validation neutral" id="su-id-status" aria-live="polite">Optional; leave blank to generate one.</span></div>
-              <div class="form-group"><label for="su-contact">Contact Number</label><input type="text" id="su-contact" placeholder="+63 917 000 0000"></div>
+              <div class="form-group"><label for="su-contact">Contact Number</label><input type="text" id="su-contact" placeholder="+63 917 000 0000"><span class="auth-validation neutral" id="su-contact-status" aria-live="polite">Use 7-20 digits, with an optional leading +.</span></div>
               <div class="form-group"><label for="su-program">Academic Program</label><select id="su-program" class="custom-select-native"></select><div class="custom-select" id="su-program-custom"></div></div>
               <div class="form-group">
                 <label for="su-year">Year Level</label>
@@ -1991,7 +1996,7 @@
             const banner = document.createElement('div');
             banner.id = 'demo-mode-banner';
             banner.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:500;max-width:calc(100% - 24px);padding:10px 14px;border:1px solid #FDE68A;border-radius:10px;background:#FFFBEB;color:#92400E;font-size:12px;box-shadow:0 6px 18px rgba(15,23,42,.12);display:flex;align-items:center;gap:12px;';
-            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. See README to connect a backend.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
+            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. Configure Supabase to enable shared data.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
             document.body.appendChild(banner);
         }
         function backendError(context, error) {
@@ -2878,6 +2883,7 @@
         function showLogin(noticeHtml) {
             byId('signup-view').style.display = 'none';
             byId('login-view').style.display = 'flex';
+            if (window.location.hash === '#signup') window.history.replaceState(null, '', window.location.pathname + window.location.search);
             const n = byId('login-notice');
             if (noticeHtml) { n.innerHTML = noticeHtml; n.style.display = 'block'; } else { n.style.display = 'none'; }
         }
@@ -2933,8 +2939,13 @@
             renderCustomSelect('su-year');
             byId('login-view').style.display = 'none';
             byId('signup-view').style.display = 'flex';
+            if (window.history.state?.authView !== 'signup') window.history.pushState({ authView: 'signup' }, '', '#signup');
         }
         window.showSignup = showSignup;
+        window.addEventListener('popstate', () => {
+            if (window.location.hash === '#signup') showSignup(signupType);
+            else showLogin();
+        });
         function setSignupType(type) {
             signupType = type === 'admin' ? 'admin' : 'student';
             clearSignupError();
@@ -2978,6 +2989,17 @@
           }
           setSignupStatus('su-id-status', 'valid', 'Valid and available student ID.');
           return true;
+        }
+        function updateSignupContactStatus() {
+          const contact = (byId('su-contact')?.value || '').trim();
+          if (!contact) {
+            setSignupStatus('su-contact-status', 'neutral', 'Use 7-20 digits, with an optional leading +.');
+            return true;
+          }
+          const digits = contact.replace(/\D/g, '');
+          const valid = /^\+?[0-9][0-9\s().-]{6,19}$/.test(contact) && digits.length >= 7 && digits.length <= 20;
+          setSignupStatus('su-contact-status', valid ? 'valid' : 'invalid', valid ? 'Valid contact number.' : 'Enter 7-20 digits with a valid phone format.');
+          return valid;
         }
         function updateSignupPasswordStatus() {
           const password = byId('su-pass')?.value || '';
@@ -3027,6 +3049,7 @@
         function setupSignupValidation() {
           byId('su-email')?.addEventListener('input', updateSignupEmailStatus);
           byId('su-id')?.addEventListener('input', updateSignupStudentIdStatus);
+          byId('su-contact')?.addEventListener('input', updateSignupContactStatus);
           byId('su-pass')?.addEventListener('input', updateSignupPasswordStatus);
           byId('su-pass2')?.addEventListener('input', updateSignupConfirmPasswordStatus);
         }
@@ -3049,6 +3072,7 @@
                 return;
             }
             if (!first || !last) { signupError('First name and last name are required.'); return; }
+            if (!updateSignupContactStatus()) { signupError('Please enter a valid contact number.'); return; }
             if (!updateSignupEmailStatus()) { signupError('Please enter a valid, available email address.'); return; }
             const emailTaken = students.some(x => (x.email || '').toLowerCase() === email.toLowerCase()) || admins.some(a => (a.email ||
                 '').toLowerCase() === email.toLowerCase());
@@ -3180,6 +3204,7 @@
         }
         function setDemoBadge(isDemo) {
             document.querySelectorAll('.demo-account-badge').forEach(el => el.remove());
+            document.getElementById('demo-preview-notice')?.remove();
             if (!isDemo) return;
             const target = byId('admin-sidebar-user') || byId('dash-fname');
             if (!target?.parentElement) return;
@@ -3188,6 +3213,11 @@
             badge.textContent = 'Demo account';
             badge.style.cssText = 'display:inline-flex;margin-left:8px;padding:3px 7px;border-radius:999px;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:600;';
             target.parentElement.appendChild(badge);
+            const notice = document.createElement('div');
+            notice.id = 'demo-preview-notice';
+            notice.className = 'demo-preview-notice';
+            notice.textContent = 'Demo preview · changes are for demonstration only';
+            document.body.appendChild(notice);
         }
         function setLiveStatus(text, tone = '#059669') {
             let el = byId('supabase-live-status');
@@ -3236,11 +3266,25 @@
             byId('supabase-live-status')?.remove();
         }
         async function signInDemoAccount(kind) {
-            if (!BACKEND_MODE || !ENABLE_DEMO_ACCOUNTS) return;
+            if (!ENABLE_DEMO_ACCOUNTS) return;
             const email = kind === 'admin' ? 'admin.demo@enrolla.test' : 'student.demo@enrolla.test';
+            if (!BACKEND_MODE) {
+                byId('login-id').value = kind === 'admin' ? email : '12345678';
+                byId('login-pass').value = 'Demo@12345';
+                await handleLoginSubmit();
+                return;
+            }
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: 'Demo@12345' });
-            if (error) { backendError('Signing into demo account', error); return; }
-            await restoreBackendSession(data.session);
+            if (error || !data?.session) {
+                console.error('[Supabase] Demo account sign-in failed', error);
+                showToast(error?.message || 'Demo account is not available. Run supabase/seed.sql first.', 'error');
+                return;
+            }
+            try {
+                await restoreBackendSession(data.session);
+            } catch (restoreError) {
+                backendError('Loading demo account', restoreError);
+            }
         }
         window.signInDemoAccount = signInDemoAccount;
         function enterStudentPortal(stu) {
