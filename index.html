@@ -64,10 +64,40 @@
             width: 100%; max-width: 100%; height: 46px; padding: 0 1.2rem; background: #FFFFFF; border: 1px solid #DCDCE4; border-radius: 999px; font-size: 0.95rem; color: #111827;
         }
         .auth-form-side .form-group select {
-            appearance: none; background-image: linear-gradient(45deg, transparent 50%, #9CA3AF 50%), linear-gradient(135deg, #9CA3AF 50%, transparent 50%);
+          appearance: none; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; background-color: #FFFFFF; background-image: linear-gradient(45deg, transparent 50%, #9CA3AF 50%), linear-gradient(135deg, #9CA3AF 50%, transparent 50%);
             background-position: calc(100% - 20px) 20px, calc(100% - 15px) 20px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 2.2rem;
         }
+        .auth-form-side .form-group select:hover { border-color: #A5B4FC; background-color: #FCFCFF; }
+        .custom-select-native { position: absolute; width: 1px !important; height: 1px !important; opacity: 0; pointer-events: none; }
+        .custom-select { position: relative; width: 100%; }
+        .custom-select-trigger { width: 100%; height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 1.2rem; background: #FFFFFF; border: 1px solid #DCDCE4; border-radius: 999px; color: #111827; font: inherit; font-size: 0.95rem; text-align: left; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
+        .custom-select-trigger > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .custom-select-trigger:hover, .custom-select.open .custom-select-trigger { border-color: #A5B4FC; background: #FCFCFF; box-shadow: 0 0 0 4px #EEF0FF; }
+        .custom-select-trigger .material-symbols-outlined { color: #9CA3AF; font-size: 18px; transition: transform 0.2s ease; }
+        .custom-select.open .custom-select-trigger .material-symbols-outlined { transform: rotate(180deg); color: #6C74F2; }
+        .custom-select-menu { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20; padding: 5px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease; }
+        .custom-select.open .custom-select-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-select-option { display: block; width: 100%; padding: 9px 11px; border: 0; border-radius: 9px; background: transparent; color: #334155; font: inherit; font-size: 0.78rem; text-align: left; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
+        .custom-select-option:hover, .custom-select-option.selected { background: #EEF2FF; color: #4F46E5; }
         .auth-form-side .form-group input:focus, .auth-form-side .form-group select:focus { border-color: #6C74F2; box-shadow: 0 0 0 4px #EEF0FF; }
+        .auth-validation { display: block; min-height: 16px; margin: 4px 12px 0; font-size: 0.68rem; line-height: 1.35; }
+        .auth-validation.valid { color: #059669; }
+        .auth-validation.invalid { color: #DC2626; }
+        .auth-validation.neutral { color: #64748B; }
+        .password-rules { display: none; flex-wrap: wrap; align-items: flex-start; gap: 3px 12px; margin: 5px 12px 0; padding: 8px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 0.67rem; color: #94A3B8; opacity: 0; transform: translateY(-4px); transition: opacity 0.25s ease, transform 0.25s ease; }
+        .password-rules.visible { display: flex; opacity: 1; transform: translateY(0); }
+        .password-rules.empty { display: none; }
+        .password-rules span { display: block; min-width: 0; max-width: 140px; overflow: hidden; white-space: nowrap; opacity: 1; transform: translateY(0); transition: max-width 0.22s ease, margin-right 0.22s ease, opacity 0.22s ease, transform 0.22s ease; }
+        .password-rules span.passed { max-width: 0; margin-right: -12px; opacity: 0; transform: translateY(-4px); }
+        .password-rules span.hidden { display: none; }
+        .password-rules span.valid { color: #059669; }
+        .password-rules span.invalid { color: #DC2626; }
+        .password-rules span::before { content: '\2713'; display: inline-block; width: 14px; }
+        .password-rules span.invalid::before { content: '\2717'; }
+        .signup-password-status { display: none; }
+        .auth-form-side .form-group input.password-valid { border-color: #10B981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16); }
+        .auth-form-side .form-group input.password-invalid { border-color: #EF4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14); }
+        .auth-form-side .form-group input.has-password-status { padding-right: 2.8rem; }
         .auth-form-side .forgot-pass { display: block; float: none; text-align: right; font-size: 0.72rem; font-weight: 600; margin: 0.6rem 0.7rem 0 0; }
         .login-btn {
             width: 100%; height: 46px; border: none; border-radius: 999px; background: #6C74F2; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 1.1rem;
@@ -86,7 +116,7 @@
         .auth-seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; background: #EFEFF5; border-radius: 999px; padding: 4px; margin-bottom: 1.3rem; }
         .auth-seg button { border: none; background: transparent; height: 38px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #7B7B88; cursor: pointer; transition: all 0.2s; }
         .auth-seg button.active { background: #FFFFFF; color: #6C74F2; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-        .auth-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 1rem; width: 100%; } .auth-grid .form-group { min-width: 0; }
+        .auth-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 0 1rem; width: 100%; } .auth-grid .form-group { min-width: 0; margin-bottom: 1.1rem; }
         .auth-form-side .form-group select { text-overflow: ellipsis; }
         .auth-grid .span-2 { grid-column: 1 / -1; }
         @media (max-width: 780px) {
@@ -116,6 +146,7 @@
         }
         .brand { display: flex; align-items: center; gap: 10px; font-size: 1.282rem; font-weight: 700; color: #1E1B4B; margin-bottom: 2.5rem; cursor: pointer; user-select: none; }
         .brand .material-symbols-outlined { color: #6366F1; font-size: 2rem; }
+        .portal-brand-logo { width: 154px; height: auto; display: block; }
         .nav-menu { list-style: none; flex: 1; } .nav-menu li { margin-bottom: 0.4rem; }
         .nav-menu a {
             display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: var(--text-muted); text-decoration: none; border-radius: 12px; font-weight: 500; transition: all 0.2s;
@@ -343,6 +374,23 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .catalog-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .admin-program-card {
+          background: white; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
+          transition: transform 0.2s, box-shadow 0.2s; animation: fadeIn 0.35s ease-out forwards;
+        }
+        .admin-program-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .admin-program-card .program-code { background: #6366F1; color: white; }
+        .admin-program-card .program-title { color: #1E293B; }
+        .admin-program-card .program-description { color: #475569; }
+        .admin-program-card .program-curriculum { background: #F8FAFC; border: 1px solid #F1F5F9; }
+        .admin-program-card .program-curriculum-label { color: var(--text-muted); }
+        .admin-program-card .program-footer { border-top-color: #F1F5F9; }
+        .admin-program-card .program-action-assign { background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; }
+        .admin-program-card .program-action-assign:hover { background: #4F46E5; color: white; border-color: #4F46E5; }
+        .admin-program-card .program-action-edit { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
+        .admin-program-card .program-action-edit:hover { background: #E2E8F0; color: #1E293B; border-color: #CBD5E1; }
+        .admin-program-card .program-action-delete { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+        .admin-program-card .program-action-delete:hover { background: #DC2626; color: white; border-color: #DC2626; }
         .cat-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 0.85rem; }
         .cat-title h3 { font-size: 0.898rem; color: #1E293B; margin-bottom: 0.25rem; }
         .cat-meta-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem; }
@@ -435,11 +483,11 @@
         }
         .edit-toggle-btn:hover { background: #E0E7FF; }
         .info-card { background: white; padding: 1.75rem; border-radius: 18px; margin-bottom: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
-        .info-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; min-width: 0; }
+        .info-group { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
         .info-group label { font-size: 0.641rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .info-group span { font-size: 0.812rem; color: #1E293B; font-weight: 500; }
-        .info-group input { font-size: 0.787rem; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; background: #F8FAFC; }
+        .info-group input { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.787rem; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; background: #F8FAFC; }
         .info-group input:focus { border-color: #6366F1; background: white; box-shadow: 0 0 0 3px #EEF2FF; }
         .info-block { display: flex; flex-direction: column; gap: 0.85rem; }
         .info-row { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #F1F5F9; padding-bottom: 10px; flex-wrap: wrap; }
@@ -484,6 +532,7 @@
             .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
             .profile-layout { flex-direction: column; align-items: center; }
             .info-grid { grid-template-columns: repeat(2, 1fr); }
+          .profile-right { width: 100%; }
         }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -524,6 +573,7 @@
             transition: transform 0.3s ease; border-right: 1px solid #1E293B;
         }
         .admin-brand { display: flex; align-items: center; gap: 12px; font-size: 1.154rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.35rem; cursor: pointer; }
+        .admin-brand .portal-brand-logo { width: 154px; }
         .admin-brand-sub { font-size: 0.616rem; color: #A5B4FC; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; padding-left: 2px; font-weight: 600; }
         .admin-nav { list-style: none; flex: 1; overflow-y: auto; } .admin-nav li { margin-bottom: 0.3rem; }
         .admin-nav a {
@@ -605,9 +655,10 @@
             justify-content: space-between;
         }
         .capacity-card.full { border-left: 5px solid #EF4444; }
-        .capacity-card.near-full { border-left: 5px solid #F59E0B; }
+        .capacity-card.near-full { border-left: 5px solid #8B5CF6; }
         .capacity-card.available { border-left: 5px solid #10B981; }
         .capacity-card.over-capacity { border: 2px solid #DC2626; background: #FEF2F2; }
+        .capacity-card .pill-near { background: #EDE9FE; color: #6D28D9; }
         .cap-stats-box {
             background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 0.727rem; line-height: 1.65;
             color: var(--navy-900);
@@ -784,15 +835,15 @@
               <div class="form-group"><label for="su-first">First Name</label><input type="text" id="su-first" required></div>
               <div class="form-group"><label for="su-last">Last Name</label><input type="text" id="su-last" required></div>
               <div class="form-group"><label for="su-mid">Middle Name (optional)</label><input type="text" id="su-mid"></div>
-              <div class="form-group"><label for="su-email">Email Address</label><input type="email" id="su-email" placeholder="name@naga.edu.ph" required></div>
+              <div class="form-group"><label for="su-email">Email Address</label><input type="email" id="su-email" placeholder="name@naga.edu.ph" required><span class="auth-validation neutral" id="su-email-status" aria-live="polite">Enter a valid email address.</span></div>
             </div>
             <div class="auth-grid" id="su-student-fields">
-              <div class="form-group"><label for="su-id">Student ID (leave blank to auto-generate)</label><input type="text" id="su-id" inputmode="numeric" placeholder="e.g. 20261234"></div>
+              <div class="form-group"><label for="su-id">Student ID (leave blank to auto-generate)</label><input type="text" id="su-id" inputmode="numeric" placeholder="e.g. 20261234"><span class="auth-validation neutral" id="su-id-status" aria-live="polite">Optional; leave blank to generate one.</span></div>
               <div class="form-group"><label for="su-contact">Contact Number</label><input type="text" id="su-contact" placeholder="+63 917 000 0000"></div>
-              <div class="form-group"><label for="su-program">Academic Program</label><select id="su-program"></select></div>
+              <div class="form-group"><label for="su-program">Academic Program</label><select id="su-program" class="custom-select-native"></select><div class="custom-select" id="su-program-custom"></div></div>
               <div class="form-group">
                 <label for="su-year">Year Level</label>
-                <select id="su-year"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option></select>
+                <select id="su-year" class="custom-select-native"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</select><div class="custom-select" id="su-year-custom"></div>
               </div>
             </div>
             <div class="auth-grid" id="su-admin-fields" style="display:none;">
@@ -800,8 +851,8 @@
               <div class="form-group"><label for="su-code">Administrator Access Code</label><input type="password" id="su-code" placeholder="Provided by the school"></div>
             </div>
             <div class="auth-grid">
-              <div class="form-group"><label for="su-pass">Password (min. 6 characters)</label><input type="password" id="su-pass" autocomplete="new-password" required></div>
-              <div class="form-group"><label for="su-pass2">Confirm Password</label><input type="password" id="su-pass2" autocomplete="new-password" required></div>
+              <div class="form-group"><label for="su-pass">Password (min. 8 characters)</label><input type="password" id="su-pass" class="has-password-status" autocomplete="new-password" minlength="8" required><span class="signup-password-status" id="su-pass-status" aria-hidden="true"></span><div class="password-rules" id="su-password-rules" aria-live="polite"><span data-rule="length">8+ characters</span><span data-rule="upper">Uppercase letter</span><span data-rule="lower">Lowercase letter</span><span data-rule="number">Number</span><span data-rule="special">Special character</span></div></div>
+              <div class="form-group"><label for="su-pass2">Confirm Password</label><input type="password" id="su-pass2" class="has-password-status" autocomplete="new-password" required><span class="signup-password-status" id="su-pass2-status" aria-hidden="true"></span></div>
             </div>
             <button type="submit" class="login-btn" id="su-submit-btn">Create Student Account</button>
           </form>
@@ -815,7 +866,7 @@
       <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
       <!-- Sidebar Navigation -->
       <aside class="sidebar" id="sidebar">
-        <div class="brand" onclick="navigateTo('dashboard')"><span class="material-symbols-outlined" style="background:#EEF2FF; padding: 6px; border-radius: 10px;">school</span> Enrolla</div>
+        <div class="brand" onclick="navigateTo('dashboard')"><svg class="portal-brand-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg></div>
         <ul class="nav-menu">
           <li class="active" data-target="dashboard"><a><span class="material-symbols-outlined">dashboard</span> Dashboard</a></li>
           <li data-target="profile"><a><span class="material-symbols-outlined">person</span> Profile</a></li>
@@ -972,7 +1023,6 @@
           <div class="header">
             <div>
               <h1><span class="material-symbols-outlined" style="color: #10B981; font-size: 2.2rem; background: #D1FAE5; padding: 10px; border-radius: 14px;">menu_book</span> Course Catalog</h1>
-              <p style="color: var(--text-muted); font-size: 0.769rem; margin-top: 4px;">Explore all 2nd-Year Bachelor of Science in Information Technology subjects, prerequisites, and syllabi.</p>
             </div>
           </div>
           <div class="catalog-controls">
@@ -996,7 +1046,6 @@
           <div class="header">
             <div>
               <h1><span class="material-symbols-outlined" style="color: #F59E0B; font-size: 2.2rem; background: #FEF3C7; padding: 10px; border-radius: 14px;">calendar_month</span> Weekly Class Schedule</h1>
-              <p style="color: var(--text-muted); font-size: 0.752rem; margin-top: 4px;">Click any class block below to view room assignment, instructor details, or manage enrollment.</p>
             </div>
             <div class="header-actions"><button class="btn-primary-outline" onclick="openCORModal()"> <span class="material-symbols-outlined" style="font-size:18px;">print</span> Printable Timetable </button></div>
           </div>
@@ -1180,7 +1229,7 @@
         <div id="requests" class="page">
           <div class="header">
             <div>
-              <h1>Special Requests</h1>
+              <h1><span class="material-symbols-outlined" style="color: #6366F1; font-size: 2.2rem; background: #EEF2FF; padding: 10px; border-radius: 14px;">support_agent</span> Special Requests</h1>
               <p style="color: var(--text-muted); font-size: 0.769rem; margin-top: 2px;">Ask the Registrar for an exception, such as late enrollment, a unit overload, or a schedule or capacity override.</p>
             </div>
           </div>
@@ -1210,7 +1259,7 @@
       <div id="admin-sidebar-overlay" class="sidebar-overlay" onclick="toggleAdminMobileSidebar()"></div>
       <!-- Admin Navy Sidebar -->
       <aside class="admin-sidebar" id="admin-sidebar">
-        <div class="admin-brand" onclick="navigateAdmin('admin-dashboard')"><span class="material-symbols-outlined" style="color:#6366F1; font-size:2rem;">school</span> Enrolla Admin</div>
+        <div class="admin-brand" onclick="navigateAdmin('admin-dashboard')"><svg class="portal-brand-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg></div>
         <div class="admin-brand-sub">Enrollment Management System</div>
         <ul class="admin-nav">
           <li class="active" data-admin-target="admin-dashboard"><a onclick="navigateAdmin('admin-dashboard')"> <span class="material-symbols-outlined">space_dashboard</span> Dashboard </a></li>
@@ -2638,15 +2687,55 @@
             if (noticeHtml) { n.innerHTML = noticeHtml; n.style.display = 'block'; } else { n.style.display = 'none'; }
         }
         window.showLogin = showLogin;
+        function closeCustomSelects(except) {
+          document.querySelectorAll('.custom-select.open').forEach(select => {
+            if (select !== except) select.classList.remove('open');
+          });
+        }
+        function renderCustomSelect(selectId) {
+          const select = byId(selectId);
+          const custom = byId(`${selectId}-custom`);
+          if (!select || !custom) return;
+          const selected = select.options[select.selectedIndex];
+          custom.innerHTML = `<button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false"><span>${escapeHtml(selected?.textContent || '')}</span><span class="material-symbols-outlined">expand_more</span></button><div class="custom-select-menu" role="listbox">${[...select.options].map(option => `<button type="button" class="custom-select-option${option.selected ? ' selected' : ''}" data-value="${escapeHtml(option.value)}" role="option">${escapeHtml(option.textContent)}</button>`).join('')}</div>`;
+          const trigger = custom.querySelector('.custom-select-trigger');
+          trigger.addEventListener('click', () => {
+            const isOpen = custom.classList.contains('open');
+            closeCustomSelects(custom);
+            custom.classList.toggle('open', !isOpen);
+            trigger.setAttribute('aria-expanded', String(!isOpen));
+          });
+          custom.querySelectorAll('.custom-select-option').forEach(option => option.addEventListener('click', () => {
+            select.value = option.dataset.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            renderCustomSelect(selectId);
+          }));
+        }
+        function setupCustomSignupSelects() {
+          renderCustomSelect('su-program');
+          renderCustomSelect('su-year');
+          document.addEventListener('click', event => {
+            if (!event.target.closest('.custom-select')) closeCustomSelects();
+          });
+        }
         function populateSignupPrograms() {
             const sel = byId('su-program');
-            if (sel) sel.innerHTML = programs.map(p => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.code)} - ${escapeHtml(p.name)}</option>`).join('');
+          if (sel) {
+            sel.innerHTML = programs.map(p => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.code)} - ${escapeHtml(p.name)}</option>`).join('');
+            renderCustomSelect('su-program');
+          }
         }
         function showSignup(type) {
             populateSignupPrograms();
             byId('signup-form').reset();
             clearSignupError();
             setSignupType(type || 'student');
+            updateSignupEmailStatus();
+            updateSignupStudentIdStatus();
+            updateSignupPasswordStatus();
+            updateSignupConfirmPasswordStatus();
+            renderCustomSelect('su-program');
+            renderCustomSelect('su-year');
             byId('login-view').style.display = 'none';
             byId('signup-view').style.display = 'flex';
         }
@@ -2664,6 +2753,88 @@
             byId('su-submit-btn').innerText = isAdmin ? 'Create Administrator Account' : 'Create Student Account';
         }
         window.setSignupType = setSignupType;
+        function setSignupStatus(id, state, message) {
+          const el = byId(id);
+          if (!el) return;
+          el.className = `auth-validation ${state}`;
+          el.innerText = message;
+        }
+        function updateSignupEmailStatus() {
+          const email = (byId('su-email')?.value || '').trim();
+          if (!email) { setSignupStatus('su-email-status', 'neutral', 'Enter a valid email address.'); return false; }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setSignupStatus('su-email-status', 'invalid', 'Enter a valid email address.'); return false; }
+          const taken = students.some(x => (x.email || '').toLowerCase() === email.toLowerCase()) || admins.some(a =>
+            (a.email || '').toLowerCase() === email.toLowerCase());
+          if (taken) { setSignupStatus('su-email-status', 'invalid', 'This email is already registered.'); return false; }
+          setSignupStatus('su-email-status', 'valid', 'Valid and available email.');
+          return true;
+        }
+        function updateSignupStudentIdStatus() {
+          const studentId = (byId('su-id')?.value || '').trim();
+          if (!studentId) { setSignupStatus('su-id-status', 'neutral', 'Optional; leave blank to generate one.'); return true; }
+          if (!/^\d{4,20}$/.test(studentId)) {
+            setSignupStatus('su-id-status', 'invalid', 'Use 4-20 numbers only.');
+            return false;
+          }
+          if (students.some(x => x.studentId.toLowerCase() === studentId.toLowerCase()) || admins.some(a =>
+            a.username.toLowerCase() === studentId.toLowerCase())) {
+            setSignupStatus('su-id-status', 'invalid', 'This ID is already in use.');
+            return false;
+          }
+          setSignupStatus('su-id-status', 'valid', 'Valid and available student ID.');
+          return true;
+        }
+        function updateSignupPasswordStatus() {
+          const password = byId('su-pass')?.value || '';
+          byId('su-password-rules')?.classList.toggle('visible', password.length > 0);
+          const rules = {
+            length: password.length >= 8,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+          };
+          Object.entries(rules).forEach(([name, valid]) => {
+            const rule = document.querySelector(`#su-password-rules [data-rule="${name}"]`);
+                if (rule) {
+                  rule.className = valid ? 'passed' : (password ? 'invalid' : '');
+                  if (valid) {
+                    setTimeout(() => {
+                      if (rule.classList.contains('passed')) rule.classList.add('hidden');
+                    }, 230);
+                  }
+                }
+          });
+          const passwordValid = Object.values(rules).every(Boolean);
+          const checklist = byId('su-password-rules');
+          checklist?.classList.toggle('empty', passwordValid);
+          setPasswordStatus('su-pass-status', password, passwordValid);
+          updateSignupConfirmPasswordStatus();
+          return passwordValid;
+        }
+        function setPasswordStatus(id, value, valid) {
+          const el = byId(id);
+          const input = byId(id === 'su-pass-status' ? 'su-pass' : 'su-pass2');
+          if (!el) return;
+          if (input) {
+            input.classList.remove('password-valid', 'password-invalid');
+            if (value) input.classList.add(valid ? 'password-valid' : 'password-invalid');
+          }
+          el.innerText = '';
+        }
+        function updateSignupConfirmPasswordStatus() {
+          const password = byId('su-pass')?.value || '';
+          const confirmation = byId('su-pass2')?.value || '';
+          const matches = confirmation.length > 0 && password === confirmation;
+          setPasswordStatus('su-pass2-status', confirmation, matches);
+          return matches;
+        }
+        function setupSignupValidation() {
+          byId('su-email')?.addEventListener('input', updateSignupEmailStatus);
+          byId('su-id')?.addEventListener('input', updateSignupStudentIdStatus);
+          byId('su-pass')?.addEventListener('input', updateSignupPasswordStatus);
+          byId('su-pass2')?.addEventListener('input', updateSignupConfirmPasswordStatus);
+        }
         function signupError(msg) {
             const el = byId('signup-error');
             el.innerText = msg;
@@ -2683,11 +2854,11 @@
                 return;
             }
             if (!first || !last) { signupError('First name and last name are required.'); return; }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { signupError('Please enter a valid email address.'); return; }
+            if (!updateSignupEmailStatus()) { signupError('Please enter a valid, available email address.'); return; }
             const emailTaken = students.some(x => (x.email || '').toLowerCase() === email.toLowerCase()) || admins.some(a => (a.email ||
                 '').toLowerCase() === email.toLowerCase());
             if (emailTaken) { signupError('An account with this email already exists.'); return; }
-            if (pass.length < 6) { signupError('Password must be at least 6 characters.'); return; }
+            if (!updateSignupPasswordStatus()) { signupError('Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.'); return; }
             if (pass !== pass2) { signupError('Passwords do not match.'); return; }
             const midInit = mid ? mid.charAt(0).toUpperCase() + '. ' : '';
             const fullName = `${first} ${midInit}${last}`;
@@ -2715,14 +2886,7 @@
             }
             let studentId = val('su-id');
             if (studentId) {
-                if (!/^[A-Za-z0-9-]{4,20}$/.test(studentId)) {
-                    signupError('Student ID can only contain letters, numbers and dashes (4 to 20 characters).');
-                    return;
-                }
-                if (students.some(x => x.studentId === studentId)) {
-                    signupError(`Student ID ${studentId} is already registered.`);
-                    return;
-                }
+              if (!updateSignupStudentIdStatus()) { signupError('Please enter a valid and available Student ID.'); return; }
             } else {
                 do { studentId = '2026' + Math.floor(1000 + Math.random() * 9000); } while (students.some(x => x.studentId === studentId));
             }
@@ -3222,8 +3386,8 @@
             const fullName = `${profileData.lname.toUpperCase()}, ${profileData.fname.toUpperCase()} ${profileData.mname.toUpperCase()}`;
             const rowsHtml = enrolled.map(c => ` <tr> <td><strong>${c.title.split('-')[0].trim()}</strong></td> <td>${c.title.split('-')[1].trim()}</td> <td>${c.type}</td>
                 <td style="text-align:center;"><strong>${c.units}</strong></td> <td>${c.scheduleText}</td> <td>${c.room}</td> <td>${c.instructor}</td> </tr> `).join('');
-            byId('cor-modal-body').innerHTML = ` <div style="border:2px solid #1E293B; padding:1.5rem; border-radius:14px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #1E293B; padding-bottom:1rem; margin-bottom:1rem; flex-wrap:wrap; gap:1rem;">
+            byId('cor-modal-body').innerHTML = ` <div style="border:2px solid #94A3B8; padding:1.5rem; border-radius:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #CBD5E1; padding-bottom:1rem; margin-bottom:1rem; flex-wrap:wrap; gap:1rem;">
                 <div> <h2 style="color:#1E1B4B; font-size:1.154rem; margin:0;">ENROLLA UNIVERSITY SYSTEM</h2> <p style="font-size:0.701rem; color:var(--text-muted); margin:0;">${profileData.campus} • Office of the University Registrar</p>
                 </div> <div style="text-align:right;"> <span class="badge badge-enrolled" style="font-size:0.727rem;">OFFICIAL STUDY LOAD (COR)</span>
                 <p style="font-size:0.667rem; color:var(--text-muted); margin-top:4px;">1st Semester, AY 2026-2027</p> </div> </div>
@@ -3892,22 +4056,22 @@
                     const sub = courses.find(c => c.code === sc);
                     return `<span class="badge badge-available" style="margin:2px;" title="${sub ? sub.name : sc}">${sc}</span>`;
                 }).join('');
-                return ` <div class="capacity-card available" style="border-left-color:var(--navy-700);"> <div>
+                return ` <div class="admin-program-card"> <div>
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;"> <div>
-                    <span class="badge" style="background:var(--navy-900); color:white; font-size:0.701rem; margin-bottom:4px;">${p.code}</span>
-                    <h3 style="font-size:0.898rem; color:var(--navy-900);">${p.name}</h3> </div> <span class="status-pill pill-open">${p.subjectCodes.length} Subjects</span> </div>
-                    <p style="font-size:0.71rem; color:var(--gray-600); margin-bottom:12px;">${p.description}</p>
-                    <div style="background:var(--gray-50); padding:10px 12px; border-radius:10px; border:1px solid var(--gray-200); margin-bottom:12px;">
-                    <div style="font-size:0.641rem; font-weight:700; color:var(--gray-600); text-transform:uppercase; margin-bottom:6px;"> Assigned Curriculum Subjects (${p.subjectCodes.length}): </div>
+                  <span class="badge program-code" style="font-size:0.701rem; margin-bottom:4px;">${p.code}</span>
+                  <h3 class="program-title" style="font-size:0.898rem;">${p.name}</h3> </div> <span class="status-pill pill-open">${p.subjectCodes.length} Subjects</span> </div>
+                  <p class="program-description" style="font-size:0.71rem; margin-bottom:12px;">${p.description}</p>
+                  <div class="program-curriculum" style="padding:10px 12px; border-radius:10px; margin-bottom:12px;">
+                  <div class="program-curriculum-label" style="font-size:0.641rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;"> Assigned Curriculum Subjects (${p.subjectCodes.length}): </div>
                     <div style="display:flex; flex-wrap:wrap; gap:4px;"> ${assignedBadges ||
                     '<span style="font-size:0.684rem; color:var(--text-muted);">No subjects assigned yet.</span>'} </div> </div> </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--gray-200); padding-top:12px; flex-wrap:wrap; gap:8px;">
-                    <span style="font-size:0.667rem; color:var(--gray-600);"> <strong>${activeStuCount}</strong> Students • <strong>${activeEnrCount}</strong> Active Enrollments </span>
-                    <div style="display:flex; gap:6px;"> <button class="admin-btn admin-btn-sm admin-btn-navy" onclick="openProgramSubjectsModal('${p.code}')">
+                  <div class="program-footer" style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F1F5F9; padding-top:12px; flex-wrap:wrap; gap:8px;">
+                  <span style="font-size:0.667rem; color:var(--text-muted);"> <strong>${activeStuCount}</strong> Students • <strong>${activeEnrCount}</strong> Active Enrollments </span>
+                    <div style="display:flex; gap:6px;"> <button class="admin-btn admin-btn-sm program-action-assign" onclick="openProgramSubjectsModal('${p.code}')">
                     <span class="material-symbols-outlined" style="font-size:15px;">Rule</span> Assign Subjects </button>
-                    <button class="admin-btn admin-btn-sm admin-btn-outline" onclick="openProgramFormModal('${p.code}')">
+                    <button class="admin-btn admin-btn-sm program-action-edit" onclick="openProgramFormModal('${p.code}')">
                     <span class="material-symbols-outlined" style="font-size:15px;">edit</span> </button>
-                    <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="attemptDeleteProgram('${p.code}')">
+                    <button class="admin-btn admin-btn-sm program-action-delete" onclick="attemptDeleteProgram('${p.code}')">
                     <span class="material-symbols-outlined" style="font-size:15px;">delete</span> </button> </div> </div> </div> `;
             }).join('');
         }
@@ -4191,7 +4355,7 @@
                 const availableSlots = Math.max(0, c.maxCapacity - c.enrolledCount);
                 const pct = Math.min(100, Math.round(ratio * 100));
                 const cardStateClass = isOver ? 'over-capacity' : (isFull ? 'full' : (isNear ? 'near-full' : 'available'));
-                const barColor = isFull ? '#EF4444' : (isNear ? '#F59E0B' : '#10B981');
+                const barColor = isFull ? '#EF4444' : (isNear ? '#8B5CF6' : '#10B981');
                 return ` <div class="capacity-card ${cardStateClass}"> <div> <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;"> <div>
                     <span class="badge badge-available" style="margin-bottom:4px;">${c.programCode}</span> <h4 style="font-size:0.855rem; color:var(--navy-900);">${c.code} - ${c.name}</h4>
                     </div> <span class="status-pill ${isFull ? 'pill-full' : (isNear ? 'pill-near' : 'pill-available')}"> ${isOver ? 'Over Limit!' :
@@ -4602,6 +4766,8 @@
 
         // Initialize state on load
         loadState();
+        setupCustomSignupSelects();
+        setupSignupValidation();
     </script>
 </body>
 </html>
