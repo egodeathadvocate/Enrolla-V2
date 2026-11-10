@@ -117,6 +117,10 @@
         #signup-view .enrolla-logo { width: 200px; }
         .auth-back-link { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; border: 0; padding: 0; margin-bottom: 1rem; background: transparent; color: #64748B; font: inherit; font-size: 0.75rem; cursor: pointer; }
         .auth-back-link:hover { color: #4F46E5; }
+        .signup-photo-picker { display: flex; align-items: center; gap: 12px; grid-column: 1 / -1; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 14px; background: #F8FAFC; }
+        .signup-photo-preview { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #C7D2FE; background: #EEF2FF; }
+        .signup-photo-picker input[type="file"] { max-width: 100%; font-size: .72rem; color: #64748B; }
+        .signup-photo-picker small { display: block; margin-top: 3px; color: #94A3B8; font-size: .66rem; }
         .demo-preview-notice { display: none; position: fixed; top: 14px; left: 50%; z-index: 600; transform: translateX(-50%); padding: 7px 12px; border: 1px solid #FCD34D; border-radius: 999px; background: rgba(255,251,235,.96); color: #92400E; font-size: .72rem; font-weight: 600; box-shadow: 0 5px 16px rgba(146,64,14,.12); }
         .auth-seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; background: #EFEFF5; border-radius: 999px; padding: 4px; margin-bottom: 1.3rem; }
         .auth-seg button { border: none; background: transparent; height: 38px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #7B7B88; cursor: pointer; transition: all 0.2s; }
@@ -882,6 +886,7 @@
               <div class="form-group"><label for="su-last">Last Name</label><input type="text" id="su-last" required></div>
               <div class="form-group"><label for="su-mid">Middle Name (optional)</label><input type="text" id="su-mid"></div>
               <div class="form-group"><label for="su-email">Email Address</label><input type="email" id="su-email" placeholder="name@naga.edu.ph" required><span class="auth-validation neutral" id="su-email-status" aria-live="polite">Enter a valid email address.</span></div>
+              <div class="signup-photo-picker"><img id="su-photo-preview" class="signup-photo-preview" alt="Profile preview"><div><label for="su-photo">Profile photo (optional)</label><input type="file" id="su-photo" accept="image/png,image/jpeg,image/webp"><small>JPG, PNG, or WebP up to 1 MB.</small><span class="auth-validation neutral" id="su-photo-status" aria-live="polite"></span></div></div>
             </div>
             <div class="auth-grid" id="su-student-fields">
               <div class="form-group"><label for="su-id">Student ID (leave blank to auto-generate)</label><input type="text" id="su-id" inputmode="numeric" placeholder="e.g. 20261234"><span class="auth-validation neutral" id="su-id-status" aria-live="polite">Optional; leave blank to generate one.</span></div>
@@ -1969,6 +1974,7 @@
         let activeCatalogFilter = 'All';
         let currentSession = { role: null, userId: null, name: null };
         let signupType = 'student';
+        let signupAvatarData = '';
         let lastEnrollmentKey = null;
         let memoryStorageFallback = {};
         let realtimeChannels = [];
@@ -2929,6 +2935,10 @@
         function showSignup(type) {
             populateSignupPrograms();
             byId('signup-form').reset();
+            signupAvatarData = '';
+            const photoPreview = byId('su-photo-preview');
+            if (photoPreview) photoPreview.src = makeAvatar('New', 'Student');
+            setSignupStatus('su-photo-status', 'neutral', '');
             clearSignupError();
             setSignupType(type || 'student');
             updateSignupEmailStatus();
@@ -3052,6 +3062,34 @@
           byId('su-contact')?.addEventListener('input', updateSignupContactStatus);
           byId('su-pass')?.addEventListener('input', updateSignupPasswordStatus);
           byId('su-pass2')?.addEventListener('input', updateSignupConfirmPasswordStatus);
+          byId('su-photo')?.addEventListener('change', handleSignupPhoto);
+        }
+        function handleSignupPhoto(event) {
+          const file = event.target.files?.[0];
+          signupAvatarData = '';
+          if (!file) {
+            setSignupStatus('su-photo-status', 'neutral', '');
+            return;
+          }
+          if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            event.target.value = '';
+            setSignupStatus('su-photo-status', 'invalid', 'Choose a JPG, PNG, or WebP image.');
+            return;
+          }
+          if (file.size > 1024 * 1024) {
+            event.target.value = '';
+            setSignupStatus('su-photo-status', 'invalid', 'Image must be 1 MB or smaller.');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => {
+            signupAvatarData = String(reader.result || '');
+            const preview = byId('su-photo-preview');
+            if (preview) preview.src = signupAvatarData;
+            setSignupStatus('su-photo-status', 'valid', 'Profile photo ready.');
+          };
+          reader.onerror = () => setSignupStatus('su-photo-status', 'invalid', 'Could not read that image.');
+          reader.readAsDataURL(file);
         }
         function signupError(msg) {
             const el = byId('signup-error');
@@ -3089,7 +3127,7 @@
                 const studentId = val('su-id') || `2026${Math.floor(1000 + Math.random() * 9000)}`;
                 const { data, error } = await supabaseClient.auth.signUp({
                     email, password: pass,
-                    options: { data: { student_id: studentId, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact: val('su-contact') || 'Not provided' } }
+                    options: { data: { student_id: studentId, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact: val('su-contact') || 'Not provided', avatar_url: signupAvatarData || '' } }
                 });
                 if (error) { signupError(escapeHtml(error.message)); return; }
                 showLogin(data.session ? 'Account created. You can now log in.' : 'Account created. Check your email to confirm your account, then log in.');
@@ -3132,12 +3170,12 @@
             const contact = val('su-contact') || 'Not provided';
             students.unshift({
                 studentId, fullName, email, contact, programCode: val('su-program'), yearLevel: val('su-year'), enrollmentStatus: 'Not Enrolled',
-                passwordHash: hashPassword(pass), registeredOn: nowStamp()
+                passwordHash: hashPassword(pass), registeredOn: nowStamp(), avatar: signupAvatarData || makeAvatar(first, last)
             });
             studentStore[studentId] = {
                 profile: {
                     fname: first, mname: mid, lname: last, email, phone: contact, dob: 'Not provided', campus: 'Naga Campus, Central Visayas',
-                    address: 'Not provided', guardian: 'Not provided', avatar: makeAvatar(first, last)
+                    address: 'Not provided', guardian: 'Not provided', avatar: signupAvatarData || makeAvatar(first, last)
                 },
                 notifications: [
                     {

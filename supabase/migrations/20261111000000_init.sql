@@ -247,6 +247,11 @@ begin
     'student'
   )
   on conflict (id) do update set email = excluded.email;
+  insert into public.student_profile_data (profile_id, phone, avatar_url)
+  values (new.id, new.raw_user_meta_data->>'contact', nullif(new.raw_user_meta_data->>'avatar_url', ''))
+  on conflict (profile_id) do update
+    set phone = coalesce(excluded.phone, student_profile_data.phone),
+        avatar_url = coalesce(excluded.avatar_url, student_profile_data.avatar_url);
   return new;
 end;
 $$;

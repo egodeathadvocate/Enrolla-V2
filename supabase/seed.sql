@@ -25,25 +25,37 @@ $$;
 -- Auth requires token fields to be non-null. This repairs demo users created
 -- by earlier versions of this seed before sign-in is attempted.
 update auth.users
-set confirmation_token = coalesce(confirmation_token, ''),
+set email = coalesce(email, ''),
+    phone = nullif(phone, ''),
+    confirmation_token = coalesce(confirmation_token, ''),
     recovery_token = coalesce(recovery_token, ''),
     email_change = coalesce(email_change, ''),
+    email_change_token_current = coalesce(email_change_token_current, ''),
     email_change_token_new = coalesce(email_change_token_new, ''),
     phone_change = coalesce(phone_change, ''),
     phone_change_token = coalesce(phone_change_token, ''),
-    reauthentication_token = coalesce(reauthentication_token, '')
+    reauthentication_token = coalesce(reauthentication_token, ''),
+    raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb),
+    raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb)
 where id in (
   '00000000-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000002'
 );
 
-insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_user_meta_data)
+insert into auth.users (
+  id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
+  phone, confirmation_token, recovery_token, email_change, email_change_token_current,
+  email_change_token_new, phone_change, phone_change_token, reauthentication_token,
+  raw_app_meta_data, raw_user_meta_data
+)
 values
   ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    'student.demo@enrolla.test', crypt('Demo@12345', gen_salt('bf')), now(),
+   null, '', '', '', '', '', '', '', '', '{}',
    '{"full_name":"Jannica Lhei B. Andrade","student_id":"12345678","role":"student","program":"BSIT","year_level":"2nd Year"}'::jsonb),
   ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    'admin.demo@enrolla.test', crypt('Demo@12345', gen_salt('bf')), now(),
+   null, '', '', '', '', '', '', '', '', '{}',
    '{"full_name":"Demo Administrator","username":"admin.demo@enrolla.test","role":"admin"}'::jsonb)
 on conflict (id) do update set encrypted_password = excluded.encrypted_password, raw_user_meta_data = excluded.raw_user_meta_data;
 
