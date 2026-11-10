@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Enrolla</title>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="20" y1="18" x2="45" y2="49" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EDE9FE"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M20 15.5h22a4 4 0 0 1 4 4v25a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4v-25a4 4 0 0 1 4-4Z" fill="url(#paper)"/>
+  <path d="M22 24h18M22 30h18M22 36h10" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="43" cy="43" r="10" fill="#4F46E5" stroke="#fff" stroke-width="2"/>
+  <path d="m38 43 3.2 3.2L48 39.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m16 15 7-5 7 5-7 5-7-5Z" fill="#C4B5FD"/>
+  <path d="M23 15v7" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
+</svg>
