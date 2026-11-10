@@ -262,7 +262,7 @@
             display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.1rem; border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 0.75rem;
             background: #F8FAFC; transition: transform 0.15s, border-color 0.15s; cursor: pointer;
         }
-        .subject-item:hover { transform: translateX(3px); border-color: #C7D2FE; }
+        .subject-item:hover { border-color: #C7D2FE; box-shadow: var(--shadow-sm); }
         .subject-info { display: flex; align-items: center; gap: 14px; }
         .subject-icon { font-size: 22.23px; color: #4F46E5; background: #EEF2FF; padding: 10px; border-radius: 12px; }
         .subject-info h4 { margin: 0; font-size: 0.812rem; font-weight: 600; color: #1E293B; }
@@ -394,9 +394,9 @@
         .catalog-grid { display: flex; flex-direction: column; gap: 0.65rem; }
         .catalog-card {
             background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 0.8rem 1rem; display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(270px, auto); grid-template-rows: auto auto; align-items: center; gap: 0.65rem 1rem;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s; cursor: pointer;
         }
-        .catalog-card:hover { transform: translateX(3px); box-shadow: var(--shadow-md); border-color: #C7D2FE; }
+        .catalog-card:hover { box-shadow: var(--shadow-md); border-color: #C7D2FE; }
         .catalog-card > div { min-width: 0; }
         .admin-program-card {
           background: white; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
@@ -2512,15 +2512,26 @@
 
         // STATE PERSISTENCE
         async function loadBackendState() {
-            const [programRows, courseRows, settingRows, enrollmentRows, requestRows, auditRows, profileRows] = await Promise.all([
+            const [programRows, courseRows, enrollmentRows, requestRows, profileRows] = await Promise.all([
                 supabaseQuery(supabaseClient.from('programs').select('*').order('code'), 'Loading programs'),
                 supabaseQuery(supabaseClient.from('courses').select('*').order('code'), 'Loading courses'),
-                supabaseQuery(supabaseClient.from('enrollment_settings').select('*').limit(1), 'Loading enrollment settings'),
                 supabaseQuery(supabaseClient.from('enrollments').select('*, courses(code)'), 'Loading enrollments'),
                 supabaseQuery(supabaseClient.from('special_requests').select('*, courses(code)').order('created_at', { ascending: false }), 'Loading requests'),
-                supabaseQuery(supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }), 'Loading audit logs'),
                 supabaseQuery(supabaseClient.from('profiles').select('*'), 'Loading profiles')
             ]);
+            let settingRows = [];
+            try {
+                const { data, error } = await supabaseClient.from('enrollment_settings').select('*').limit(1);
+                if (error) throw error;
+                settingRows = data || [];
+            } catch (error) {
+                console.warn('[Supabase] Enrollment settings unavailable; using local defaults.', error);
+                settingRows = [];
+            }
+            let auditRows = [];
+            if (currentSession.role === 'admin' || currentSession.role === 'super_admin') {
+                auditRows = await supabaseQuery(supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }), 'Loading audit logs');
+            }
             programs = (programRows || []).map(p => ({ ...p, subjectCodes: p.subject_codes || [] }));
             if (!programs.length) programs = JSON.parse(JSON.stringify(DEFAULT_PROGRAMS));
             courses = (courseRows || []).map(c => ({
@@ -2646,7 +2657,8 @@
                         avatar_url: profileData.avatar, medical_cleared: medicalCleared
                     }, { onConflict: 'profile_id' }), 'Saving profile data');
                     await supabaseQuery(supabaseClient.from('notifications').upsert((notifications || []).map(n => ({
-                        id: n.id, profile_id: authUser.id, text: n.text, icon: n.icon, target: n.target,
+                        ...(typeof n.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(n.id) ? { id: n.id } : {}),
+                        profile_id: authUser.id, text: n.text, icon: n.icon, target: n.target,
                         unread: !!n.unread
                     })), { onConflict: 'id' }), 'Saving notifications');
                     await supabaseQuery(supabaseClient.from('enrollments').upsert(enrollments.filter(e => e.studentId === currentSession.userId).map(e => ({
