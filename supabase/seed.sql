@@ -77,8 +77,8 @@ on conflict (code) do update set name=excluded.name, department=excluded.departm
 
 insert into public.profiles (id, student_id, username, full_name, email, contact, program_code, year_level, enrollment_status, role, is_demo)
 values
-('00000000-0000-0000-0000-000000000001','12345678',null,'Jannica Lhei B. Andrade','student.demo@enrolla.test','+63 917 842 9104','BSIT','2nd Year','Enrolled','student',true),
-('00000000-0000-0000-0000-000000000002',null,'admin.demo@enrolla.test','Demo Administrator','admin.demo@enrolla.test',null,null,null,'Enrolled','admin',true)
+((select id from auth.users where lower(email) = 'student.demo@enrolla.test'),'12345678',null,'Jannica Lhei B. Andrade','student.demo@enrolla.test','+63 917 842 9104','BSIT','2nd Year','Enrolled','student',true),
+((select id from auth.users where lower(email) = 'admin.demo@enrolla.test'),null,'admin.demo@enrolla.test','Demo Administrator','admin.demo@enrolla.test',null,null,null,'Enrolled','admin',true)
 on conflict (id) do update set student_id=excluded.student_id, username=excluded.username, full_name=excluded.full_name, email=excluded.email, role=excluded.role, is_demo=excluded.is_demo;
 
 insert into public.courses (code,name,title,description,instructor,building,room,schedule_text,units,program_code,max_capacity,enrolled_count,status,course_type,days,start_hour,duration,color,prerequisite,topics) values
@@ -111,11 +111,11 @@ values (1,'manual','Open','2026-08-01T08:00:00+00','2026-12-15T23:59:00+00','202
 on conflict (id) do update set mode=excluded.mode,manual_status=excluded.manual_status,start_date_time=excluded.start_date_time,end_date_time=excluded.end_date_time,academic_year=excluded.academic_year,semester=excluded.semester;
 
 insert into public.student_profile_data (profile_id,first_name,middle_name,last_name,phone,campus,address,guardian,avatar_url)
-values ('00000000-0000-0000-0000-000000000001','Jannica Lhei','Barcenas','Andrade','+63 917 842 9104','Naga Campus, Central Visayas','Poblacion, City of Naga, Cebu','Maria B. Andrade (+63 918 553 2019)','https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=300')
+values ((select id from auth.users where lower(email) = 'student.demo@enrolla.test'),'Jannica Lhei','Barcenas','Andrade','+63 917 842 9104','Naga Campus, Central Visayas','Poblacion, City of Naga, Cebu','Maria B. Andrade (+63 918 553 2019)','https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=300')
 on conflict (profile_id) do update set first_name=excluded.first_name,middle_name=excluded.middle_name,last_name=excluded.last_name,phone=excluded.phone,campus=excluded.campus,address=excluded.address,guardian=excluded.guardian,avatar_url=excluded.avatar_url;
 
 insert into public.enrollments (id,student_id,course_id,program_code,status,date_submitted)
-select v.id, '00000000-0000-0000-0000-000000000001', c.id, 'BSIT', 'Approved', v.submitted
+select v.id, (select id from auth.users where lower(email) = 'student.demo@enrolla.test'), c.id, 'BSIT', 'Approved', v.submitted
 from (values
  ('10000000-0000-0000-0000-000000000001'::uuid,'CS 201', '2026-08-18 09:15+00'::timestamptz),
  ('10000000-0000-0000-0000-000000000002'::uuid,'IT 315', '2026-08-18 09:16+00'::timestamptz),
@@ -124,7 +124,7 @@ from (values
 on conflict (student_id,course_id) do update set status=excluded.status,date_submitted=excluded.date_submitted;
 
 insert into public.notifications (profile_id,icon,text,target,unread) values
-('00000000-0000-0000-0000-000000000001','check_circle','Enrollment for 1st Sem AY 2026-2027 is now open!','enrollment',true),
-('00000000-0000-0000-0000-000000000001','local_library','University Library clearance has been verified.','status',true),
-('00000000-0000-0000-0000-000000000001','medical_services','Reminder: Submit Annual Physical Exam to Medical Clinic.','status',false)
+((select id from auth.users where lower(email) = 'student.demo@enrolla.test'),'check_circle','Enrollment for 1st Sem AY 2026-2027 is now open!','enrollment',true),
+((select id from auth.users where lower(email) = 'student.demo@enrolla.test'),'local_library','University Library clearance has been verified.','status',true),
+((select id from auth.users where lower(email) = 'student.demo@enrolla.test'),'medical_services','Reminder: Submit Annual Physical Exam to Medical Clinic.','status',false)
 on conflict do nothing;
