@@ -851,6 +851,10 @@
             </div>
             <button type="submit" class="login-btn" id="login-submit-btn">Log In</button>
           </form>
+          <div id="demo-account-actions" style="display:none; gap:8px; margin-top:12px; flex-wrap:wrap;">
+            <button type="button" class="btn-primary-outline" style="flex:1; min-width:130px;" onclick="signInDemoAccount('student')">Try demo student</button>
+            <button type="button" class="btn-primary-outline" style="flex:1; min-width:130px;" onclick="signInDemoAccount('admin')">Try demo admin</button>
+          </div>
           <p class="auth-switch">Don't have an account? <a onclick="showSignup('student')">Create account</a></p>
         </div>
         <div class="auth-logo-side"><svg class="enrolla-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg></div>
@@ -1220,8 +1224,8 @@
                   <div class="info-group"><label>Last Name</label> <span class="view-mode" id="v-lname">Andrade</span> <input type="text" class="edit-mode" id="i-lname" value="Andrade" style="display:none;"></div>
                   <div class="info-group">
                     <label>Email Address</label>
-                    <span class="view-mode" id="v-email">jannica.andrade@naga.edu.ph</span>
-                    <input type="email" class="edit-mode" id="i-email" value="jannica.andrade@naga.edu.ph" style="display:none;">
+                    <span class="view-mode" id="v-email">student.demo@enrolla.test</span>
+                    <input type="email" class="edit-mode" id="i-email" value="student.demo@enrolla.test" style="display:none;">
                   </div>
                   <div class="info-group">
                     <label>Contact Number</label>
@@ -1721,7 +1725,7 @@
               </select>
             </div>
             <div class="modal-field full-width">
-              <label>Login Password (leave blank to keep / use default "password123")</label>
+              <label>Login Password (leave blank to keep / use the demo password)</label>
               <input type="text" id="stu-form-password" placeholder="Min 6 characters" autocomplete="off">
             </div>
             <div class="modal-field full-width">
@@ -1940,14 +1944,21 @@
         </div>
       </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
     <!-- JAVASCRIPT LOGIC (RELATIONAL DB + PORTAL + ADMIN) -->
     <script>
+        // ===== FORK SETUP: paste your Supabase values here =====
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const ENABLE_DEMO_ACCOUNTS = true;
+        const BACKEND_MODE = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+        const supabaseClient = BACKEND_MODE && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         // shorthand used throughout the script
         const byId = id => document.getElementById(id);
         const MAX_UNITS = 24;
         const MAX_UNITS_CEILING = 30;
         const ADMIN_SIGNUP_CODE = 'ENROLLA-ADMIN-2026'; // required to register a new administrator account
-        const DEMO_STUDENT_PASSWORD = 'password123'; // default password for students that have no password set
+        const DEMO_STUDENT_PASSWORD = 'Demo@12345'; // local-only public demo password
         const STORAGE_KEY = 'enrolla_relational_db_v3';
         let isEditMode = false;
         let activeCatalogFilter = 'All';
@@ -1955,6 +1966,7 @@
         let signupType = 'student';
         let lastEnrollmentKey = null;
         let memoryStorageFallback = {};
+        let realtimeChannels = [];
 
         // Safe Storage Helpers (Prevents SecurityError in sandboxed iframes or file:// contexts)
         function safeGetItem(key) {
@@ -1973,6 +1985,23 @@
             try { if (window.localStorage) window.localStorage.removeItem(key); } catch (e) {
                 // Ignore
             }
+        }
+        function showDemoModeBanner() {
+            if (BACKEND_MODE || byId('demo-mode-banner')) return;
+            const banner = document.createElement('div');
+            banner.id = 'demo-mode-banner';
+            banner.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:500;max-width:calc(100% - 24px);padding:10px 14px;border:1px solid #FDE68A;border-radius:10px;background:#FFFBEB;color:#92400E;font-size:12px;box-shadow:0 6px 18px rgba(15,23,42,.12);display:flex;align-items:center;gap:12px;';
+            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. See README to connect a backend.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
+            document.body.appendChild(banner);
+        }
+        function backendError(context, error) {
+            console.error(`[Supabase] ${context}`, error);
+            showToast(`${context} failed. Please try again.`, 'error');
+        }
+        async function supabaseQuery(query, context) {
+            const { data, error } = await query;
+            if (error) { backendError(context, error); throw error; }
+            return data;
         }
 
         // Table Sorting & Pagination State
@@ -2293,7 +2322,7 @@
         ];
         const DEFAULT_STUDENTS = [
             {
-                studentId: '12345678', fullName: 'Jannica Lhei B. Andrade', email: 'jannica.andrade@naga.edu.ph', contact: '+63 917 842 9104',
+                studentId: '12345678', fullName: 'Jannica Lhei B. Andrade', email: 'student.demo@enrolla.test', contact: '+63 917 842 9104',
                 programCode: 'BSIT', yearLevel: '2nd Year', enrollmentStatus: 'Enrolled'
             },
             {
@@ -2342,7 +2371,7 @@
             mode: 'manual', manualStatus: 'Open', startDateTime: '2026-08-01T08:00', endDateTime: '2026-12-15T23:59', academicYear: '2026 - 2027',
             semester: '1st Semester (Fall)'
         };
-        const DEFAULT_ADMINS = [{ username: 'admin', fullName: 'System Administrator', passwordHash: hashPassword('admin123'), role: 'Super Admin' }];
+        const DEFAULT_ADMINS = [{ username: 'admin.demo@enrolla.test', fullName: 'Demo Administrator', passwordHash: hashPassword('Demo@12345'), role: 'Administrator' }];
         const DEFAULT_AUDIT_LOGS = [
             {
                 id: 1, timestamp: '2026-08-21 08:00:00', actor: 'admin', role: 'Super Admin', module: 'Settings', action: 'OPEN_ENROLLMENT',
@@ -2357,7 +2386,7 @@
             fname: 'Jannica Lhei',
             mname: 'Barcenas',
             lname: 'Andrade',
-            email: 'jannica.andrade@naga.edu.ph',
+            email: 'student.demo@enrolla.test',
             phone: '+63 917 842 9104',
             dob: 'May 14, 2006',
             campus: 'Naga Campus, Central Visayas',
@@ -2427,7 +2456,82 @@
         let specialRequests = [];
 
         // STATE PERSISTENCE
-        function loadState() {
+        async function loadBackendState() {
+            const [programRows, courseRows, settingRows, enrollmentRows, requestRows, auditRows, profileRows] = await Promise.all([
+                supabaseQuery(supabaseClient.from('programs').select('*').order('code'), 'Loading programs'),
+                supabaseQuery(supabaseClient.from('courses').select('*').order('code'), 'Loading courses'),
+                supabaseQuery(supabaseClient.from('enrollment_settings').select('*').limit(1), 'Loading enrollment settings'),
+                supabaseQuery(supabaseClient.from('enrollments').select('*, courses(code)'), 'Loading enrollments'),
+                supabaseQuery(supabaseClient.from('special_requests').select('*, courses(code)').order('created_at', { ascending: false }), 'Loading requests'),
+                supabaseQuery(supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }), 'Loading audit logs'),
+                supabaseQuery(supabaseClient.from('profiles').select('*'), 'Loading profiles')
+            ]);
+            programs = (programRows || []).map(p => ({ ...p, subjectCodes: p.subject_codes || [] }));
+            courses = (courseRows || []).map(c => ({
+                ...c, id: c.id, code: c.code, name: c.name, title: c.title || `${c.code} - ${c.name}`,
+                desc: c.description || c.desc || '', programCode: c.program_code, maxCapacity: c.max_capacity,
+                enrolledCount: c.enrolled_count || 0, scheduleText: c.schedule_text, details: c.details || '',
+                startHour: c.start_hour, duration: c.duration, type: c.course_type || c.type, prereq: c.prerequisite || c.prereq || '', topics: c.topics || [],
+                status: 'available'
+            }));
+            enrollmentSettings = settingRows?.[0] ? {
+                ...settingRows[0], mode: settingRows[0].mode === 'automatic' ? 'auto' : settingRows[0].mode,
+                startDateTime: settingRows[0].start_date_time, endDateTime: settingRows[0].end_date_time,
+                manualStatus: settingRows[0].manual_status, academicYear: settingRows[0].academic_year
+            } : { ...DEFAULT_SETTINGS };
+            const profileById = new Map((profileRows || []).map(p => [p.id, p]));
+            enrollments = (enrollmentRows || []).map(e => ({
+                ...e,                 id: e.id, studentId: profileById.get(e.student_id)?.student_id || e.student_id, subjectCode: e.courses?.code || e.subject_code || '', courseId: e.course_id, programCode: e.program_code,
+                dateSubmitted: e.date_submitted || e.created_at, status: e.status
+            }));
+            specialRequests = (requestRows || []).map(r => ({
+                ...r, id: r.id, studentId: profileById.get(r.student_id)?.student_id || r.student_id, subjectCode: r.courses?.code || r.subject_code || '',
+                dateSubmitted: r.date_submitted || r.created_at, adminRemark: r.admin_remark,
+                decidedBy: r.decided_by, decidedAt: r.decided_at
+            }));
+            auditLogs = (auditRows || []).map(a => ({
+                ...a, id: a.id, timestamp: a.created_at || a.timestamp, actor: a.actor_id || a.actor,
+                module: a.module, action: a.action, details: a.details
+            }));
+            students = (profileRows || []).filter(p => p.role === 'student').map(p => ({
+                id: p.id, userId: p.id, studentId: p.student_id || p.id, fullName: p.full_name || 'Student',
+                email: p.email || '', contact: p.contact || 'Not provided', programCode: p.program || p.program_code || '',
+                yearLevel: p.year_level || '', enrollmentStatus: p.enrollment_status || 'Not Enrolled',
+                registeredOn: p.created_at, isDemo: !!p.is_demo
+            }));
+            admins = (profileRows || []).filter(p => p.role === 'admin' || p.role === 'super_admin').map(p => ({
+                id: p.id, userId: p.id, username: p.email, email: p.email, fullName: p.full_name || 'Administrator',
+                role: p.role, isDemo: !!p.is_demo
+            }));
+            if (currentSession.role === 'student' && currentSession.userId) {
+                const profile = profileRows.find(p => p.id === currentSession.userId || p.student_id === currentSession.userId);
+                if (profile) {
+                    currentSession.userId = profile.student_id || profile.id;
+                    activateStudent(currentSession.userId);
+                }
+                const [dataRow, notificationRows] = await Promise.all([
+                    supabaseQuery(supabaseClient.from('student_profile_data').select('*').eq('profile_id', profile?.id || currentSession.userId).maybeSingle(), 'Loading profile data'),
+                    supabaseQuery(supabaseClient.from('notifications').select('*').eq('profile_id', profile?.id || currentSession.userId).order('created_at', { ascending: false }), 'Loading notifications')
+                ]);
+                if (dataRow) {
+                    profileData = dataRow.profile || {
+                        fname: dataRow.first_name || '', mname: dataRow.middle_name || '', lname: dataRow.last_name || '',
+                        email: profile?.email || '', phone: dataRow.phone || '', dob: dataRow.date_of_birth || '',
+                        campus: dataRow.campus || '', address: dataRow.address || '', guardian: dataRow.guardian || '',
+                        avatar: dataRow.avatar_url || ''
+                    };
+                    medicalCleared = !!dataRow.medical_cleared;
+                }
+                notifications = (notificationRows || []).map(n => ({ ...n, id: n.id, text: n.text, unread: n.unread, target: n.target || 'dashboard' }));
+                if (studentStore[currentSession.userId]) studentStore[currentSession.userId].notifications = notifications;
+            }
+            syncStudentCoursesWithEnrollments();
+        }
+        async function loadState() {
+            if (BACKEND_MODE) {
+                await loadBackendState();
+                return;
+            }
             try {
                 const raw = safeGetItem(STORAGE_KEY);
                 if (raw) {
@@ -2472,10 +2576,64 @@
             medicalCleared = false;
             syncStudentCoursesWithEnrollments();
         }
+        async function saveBackendState() {
+            if (!supabaseClient) return;
+            if (currentSession.role === 'student' && currentSession.userId) {
+                const profile = students.find(s => s.studentId === currentSession.userId);
+                const authUser = (await supabaseClient.auth.getUser()).data.user;
+                if (authUser) {
+                    await supabaseQuery(supabaseClient.from('student_profile_data').upsert({
+                        profile_id: authUser.id, first_name: profileData.fname, middle_name: profileData.mname,
+                        last_name: profileData.lname, phone: profileData.phone, date_of_birth: profileData.dob || null,
+                        campus: profileData.campus, address: profileData.address, guardian: profileData.guardian,
+                        avatar_url: profileData.avatar, medical_cleared: medicalCleared
+                    }, { onConflict: 'profile_id' }), 'Saving profile data');
+                    await supabaseQuery(supabaseClient.from('notifications').upsert((notifications || []).map(n => ({
+                        id: n.id, profile_id: authUser.id, text: n.text, icon: n.icon, target: n.target,
+                        unread: !!n.unread
+                    })), { onConflict: 'id' }), 'Saving notifications');
+                    await supabaseQuery(supabaseClient.from('enrollments').upsert(enrollments.filter(e => e.studentId === currentSession.userId).map(e => ({
+                        id: e.id, student_id: authUser.id, course_id: e.courseId || courses.find(c => c.code === e.subjectCode)?.id,
+                        program_code: e.programCode,
+                        status: e.status, date_submitted: e.dateSubmitted
+                    })), { onConflict: 'id' }), 'Saving enrollments');
+                    await supabaseQuery(supabaseClient.from('special_requests').upsert(specialRequests.filter(r => r.studentId === currentSession.userId).map(r => ({
+                        id: r.id, student_id: authUser.id, type: r.type, course_id: courses.find(c => c.code === r.subjectCode)?.id || null,
+                        units: r.units, reason: r.reason, status: r.status, date_submitted: r.dateSubmitted,
+                        admin_remark: r.adminRemark, decided_by: r.decidedBy, decided_at: r.decidedAt
+                    })), { onConflict: 'id' }), 'Saving requests');
+                }
+            }
+            if (currentSession.role === 'admin' || currentSession.role === 'super_admin') {
+                await Promise.all([
+                    supabaseQuery(supabaseClient.from('courses').upsert(courses.map(c => ({
+                        id: c.id, code: c.code, name: c.name, title: c.title, description: c.desc,
+                        instructor: c.instructor, room: c.room, schedule_text: c.scheduleText, details: c.details,
+                        units: c.units, program_code: c.programCode, max_capacity: c.maxCapacity,
+                        enrolled_count: c.enrolledCount, course_type: c.type, days: c.days, start_hour: c.startHour,
+                        duration: c.duration, color: c.color, prerequisite: c.prereq, topics: c.topics
+                    })), { onConflict: 'id' }), 'Saving courses'),
+                    supabaseQuery(supabaseClient.from('programs').upsert(programs.map(p => ({
+                        code: p.code, name: p.name, department: p.department, description: p.description,
+                        subject_codes: p.subjectCodes || []
+                    })), { onConflict: 'code' }), 'Saving programs'),
+                    supabaseQuery(supabaseClient.from('enrollment_settings').upsert({
+                        id: enrollmentSettings.id || 1, mode: enrollmentSettings.mode === 'auto' ? 'automatic' : enrollmentSettings.mode,
+                        manual_status: enrollmentSettings.manualStatus, start_date_time: enrollmentSettings.startDateTime,
+                        end_date_time: enrollmentSettings.endDateTime, academic_year: enrollmentSettings.academicYear,
+                        semester: enrollmentSettings.semester
+                    }, { onConflict: 'id' }), 'Saving settings')
+                ]);
+            }
+        }
         function saveState() {
             try {
                 if (currentSession.role === 'student' && currentSession.userId) {
                     studentStore[currentSession.userId] = { profile: profileData, notifications, medicalCleared };
+                }
+                if (BACKEND_MODE) {
+                    saveBackendState().catch(error => console.error('[Supabase] Save failed', error));
+                    return;
                 }
                 safeSetItem(STORAGE_KEY, JSON.stringify({
                     courses, programs, students, enrollments, enrollmentSettings, admins, auditLogs, studentStore, specialRequests
@@ -2626,7 +2784,7 @@
                     updateAllViews();
                     showToast(status === 'Deadline Passed' ? 'The enrollment deadline has passed. Subject changes are now locked.' :
                         `Enrollment status is now: ${status}.`, status === 'Open' ? 'success' : 'warning');
-                } else if (currentSession.role === 'admin') {
+                } else if (currentSession.role === 'admin' || currentSession.role === 'super_admin') {
                     renderAllAdminViews();
                     showToast(`Enrollment status changed automatically: ${status}.`, 'info');
                 }
@@ -2637,7 +2795,7 @@
             const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
             auditLogs.unshift({
                 id: Date.now(), timestamp: nowStr, actor: currentSession.userId || 'admin',
-                role: currentSession.role === 'admin' ? 'Administrator' : 'Student', module, action, details
+                role: currentSession.role === 'admin' || currentSession.role === 'super_admin' ? 'Administrator' : 'Student', module, action, details
             });
             saveState();
         }
@@ -2880,7 +3038,7 @@
             showToast(msg, 'error');
         }
         function clearSignupError() { const el = byId('signup-error'); if (el) el.style.display = 'none'; }
-        function handleSignupSubmit(e) {
+        async function handleSignupSubmit(e) {
             e.preventDefault();
             clearSignupError();
             const val = id => (byId(id).value || '').trim();
@@ -2899,6 +3057,22 @@
             if (pass !== pass2) { signupError('Passwords do not match.'); return; }
             const midInit = mid ? mid.charAt(0).toUpperCase() + '. ' : '';
             const fullName = `${first} ${midInit}${last}`;
+            if (BACKEND_MODE) {
+                if (signupType === 'admin') {
+                    signupError('Administrator accounts are created or promoted by a super administrator.');
+                    return;
+                }
+                const studentId = val('su-id') || `2026${Math.floor(1000 + Math.random() * 9000)}`;
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email, password: pass,
+                    options: { data: { student_id: studentId, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact: val('su-contact') || 'Not provided' } }
+                });
+                if (error) { signupError(escapeHtml(error.message)); return; }
+                showLogin(data.session ? 'Account created. You can now log in.' : 'Account created. Check your email to confirm your account, then log in.');
+                byId('login-id').value = email;
+                byId('login-pass').value = '';
+                return;
+            }
             if (signupType === 'admin') {
                 const username = val('su-username');
                 const code = byId('su-code').value.trim();
@@ -2978,11 +3152,97 @@
             byId('app-view').style.display = 'none';
             byId('admin-view').style.display = 'flex';
             byId('admin-sidebar-user').innerText = admin.fullName;
+            setDemoBadge(!!admin.isDemo);
             logAdminAction('Auth', 'ADMIN_LOGIN', `Administrator ${admin.username} logged in.`);
             navigateAdmin('admin-dashboard');
             lastEnrollmentKey = enrollmentStateKey();
             showToast(`Welcome, ${admin.fullName}!`, 'success');
         }
+        async function restoreBackendSession(session) {
+            if (!session?.user || !supabaseClient) return;
+            const profile = await supabaseQuery(supabaseClient.from('profiles').select('*').eq('id', session.user.id).single(), 'Loading account profile');
+            currentSession = { role: profile.role, userId: profile.student_id || profile.id, authUserId: profile.id, name: profile.full_name || session.user.email, isDemo: !!profile.is_demo };
+            await loadBackendState();
+            setupRealtimeSubscriptions();
+            if (profile.role === 'admin' || profile.role === 'super_admin') {
+                byId('login-view').style.display = 'none';
+                byId('signup-view').style.display = 'none';
+                byId('app-view').style.display = 'none';
+                byId('admin-view').style.display = 'flex';
+                byId('admin-sidebar-user').innerText = profile.full_name || session.user.email;
+                setDemoBadge(!!profile.is_demo);
+                navigateAdmin('admin-dashboard');
+            } else {
+                const student = students.find(item => item.userId === profile.id || item.studentId === profile.student_id);
+                enterStudentPortal(student || { studentId: profile.student_id || profile.id, fullName: profile.full_name || session.user.email, email: session.user.email });
+            }
+            showToast(`Welcome, ${escapeHtml(profile.full_name || session.user.email)}!`, 'success');
+        }
+        function setDemoBadge(isDemo) {
+            document.querySelectorAll('.demo-account-badge').forEach(el => el.remove());
+            if (!isDemo) return;
+            const target = byId('admin-sidebar-user') || byId('dash-fname');
+            if (!target?.parentElement) return;
+            const badge = document.createElement('span');
+            badge.className = 'demo-account-badge';
+            badge.textContent = 'Demo account';
+            badge.style.cssText = 'display:inline-flex;margin-left:8px;padding:3px 7px;border-radius:999px;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:600;';
+            target.parentElement.appendChild(badge);
+        }
+        function setLiveStatus(text, tone = '#059669') {
+            let el = byId('supabase-live-status');
+            if (!el) {
+                el = document.createElement('span');
+                el.id = 'supabase-live-status';
+                el.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:180;font-size:11px;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid #E2E8F0;box-shadow:0 3px 12px rgba(15,23,42,.08);';
+                document.body.appendChild(el);
+            }
+            el.style.color = tone;
+            el.textContent = text;
+        }
+        async function refreshFromRealtime() {
+            try {
+                setLiveStatus('Reconnecting...', '#D97706');
+                await loadBackendState();
+                if (currentSession.role === 'student') updateAllViews();
+                else if (currentSession.role === 'admin' || currentSession.role === 'super_admin') renderAllAdminViews();
+                setLiveStatus('Live', '#059669');
+            } catch (error) {
+                setLiveStatus('Reconnecting...', '#D97706');
+            }
+        }
+        function setupRealtimeSubscriptions() {
+            if (!BACKEND_MODE || !supabaseClient || realtimeChannels.length) return;
+            const tables = ['profiles', 'courses', 'programs', 'enrollments', 'special_requests', 'notifications', 'student_profile_data', 'enrollment_settings', 'audit_logs'];
+            tables.forEach(table => {
+                const ownedFilter = currentSession.role === 'student' && currentSession.authUserId
+                    ? ({ profiles: `id=eq.${currentSession.authUserId}`, enrollments: `student_id=eq.${currentSession.authUserId}`, special_requests: `student_id=eq.${currentSession.authUserId}`, notifications: `profile_id=eq.${currentSession.authUserId}`, student_profile_data: `profile_id=eq.${currentSession.authUserId}` }[table])
+                    : undefined;
+                const change = { event: '*', schema: 'public', table };
+                if (ownedFilter) change.filter = ownedFilter;
+                const channel = supabaseClient.channel(`enrolla-${table}-${currentSession.authUserId || currentSession.userId}`)
+                    .on('postgres_changes', change, () => refreshFromRealtime())
+                    .subscribe(status => {
+                        if (status === 'SUBSCRIBED') setLiveStatus('Live', '#059669');
+                        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setLiveStatus('Reconnecting...', '#D97706');
+                    });
+                realtimeChannels.push(channel);
+            });
+        }
+        async function cleanupRealtimeSubscriptions() {
+            if (!supabaseClient) return;
+            await Promise.all(realtimeChannels.map(channel => supabaseClient.removeChannel(channel)));
+            realtimeChannels = [];
+            byId('supabase-live-status')?.remove();
+        }
+        async function signInDemoAccount(kind) {
+            if (!BACKEND_MODE || !ENABLE_DEMO_ACCOUNTS) return;
+            const email = kind === 'admin' ? 'admin.demo@enrolla.test' : 'student.demo@enrolla.test';
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: 'Demo@12345' });
+            if (error) { backendError('Signing into demo account', error); return; }
+            await restoreBackendSession(data.session);
+        }
+        window.signInDemoAccount = signInDemoAccount;
         function enterStudentPortal(stu) {
             currentSession = { role: 'student', userId: stu.studentId, name: stu.fullName };
             activateStudent(stu.studentId);
@@ -2992,19 +3252,37 @@
             byId('admin-view').style.display = 'none';
             byId('app-view').style.display = 'flex';
             applyProfileToDOM();
+            setDemoBadge(!!stu.isDemo);
             updateAllViews();
             navigateTo('dashboard');
             showToast(`Welcome back, ${profileData.fname}!`, 'success');
         }
-        function handleLoginSubmit(e) {
+        async function handleLoginSubmit(e) {
             if (e && typeof e.preventDefault === 'function') e.preventDefault();
-            if (!courses || courses.length === 0) loadState();
             const identifier = (byId('login-id').value || '').trim();
             const rawPass = byId('login-pass').value || '';
             if (!identifier || !rawPass) {
                 showToast('Please enter your username or ID number and password.', 'warning');
                 return false;
             }
+            if (BACKEND_MODE) {
+                let email = identifier;
+                if (!identifier.includes('@')) {
+                    const { data, error } = await supabaseClient.rpc('email_for_login', { identifier: identifier });
+                    if (error || !data) { showToast('Incorrect email, student ID, or password.', 'error'); return false; }
+                    email = data;
+                }
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: rawPass });
+                if (error || !data.user) {
+                    byId('login-pass').value = '';
+                    showToast(error?.message || 'Incorrect email or password.', 'error');
+                    return false;
+                }
+                await restoreBackendSession(data.session);
+                byId('login-pass').value = '';
+                return false;
+            }
+            if (!courses || courses.length === 0) loadState();
             const passHash = hashPassword(rawPass);
             const fail = () => {
                 byId('login-pass').value = '';
@@ -3027,9 +3305,15 @@
             return false;
         }
         window.handleLoginSubmit = handleLoginSubmit;
-        function handlePasswordReset() {
+        async function handlePasswordReset() {
             const val = byId('reset-input').value.trim();
             if (!val) { showToast('Please enter your Student ID or Email.', 'warning'); return; }
+            if (BACKEND_MODE) {
+                const email = val.includes('@') ? val : (await supabaseClient.rpc('email_for_login', { identifier: val })).data;
+                if (!email) { showToast('No account was found for that ID or email.', 'error'); return; }
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
+                if (error) { backendError('Sending password reset email', error); return; }
+            }
             closeModal('forgot-modal');
             showToast(`Password reset instructions sent to ${val}`, 'success');
         }
@@ -3678,9 +3962,13 @@
         }
         function openModal(id) { byId(id).classList.add('open'); }
         function closeModal(id) { byId(id).classList.remove('open'); }
-        function logout(e) {
+        async function logout(e) {
             if (e) e.stopPropagation();
             saveState();
+            if (BACKEND_MODE && supabaseClient) {
+                await cleanupRealtimeSubscriptions();
+                await supabaseClient.auth.signOut();
+            }
             currentSession = { role: null, userId: null, name: null };
             profileData = {};
             notifications = [];
@@ -3699,7 +3987,7 @@
 
         // ADMIN DASHBOARD CONTROLLER & ALL 7 ADMIN MODULES
         function requireAdmin() {
-            if (currentSession.role !== 'admin') {
+            if (currentSession.role !== 'admin' && currentSession.role !== 'super_admin') {
                 showToast('Unauthorized access: Administrator privileges required.', 'error');
                 return false;
             }
@@ -4970,9 +5258,32 @@
         });
 
         // Initialize state on load
-        loadState();
-        setupCustomSignupSelects();
-        setupSignupValidation();
+        async function initializeApplication() {
+            if (!BACKEND_MODE) {
+                showDemoModeBanner();
+                loadState();
+                if (ENABLE_DEMO_ACCOUNTS) byId('demo-account-actions').style.display = 'flex';
+                setupCustomSignupSelects();
+                setupSignupValidation();
+                return;
+            }
+            try {
+                const { data } = await supabaseClient.auth.getSession();
+                if (data.session) await restoreBackendSession(data.session);
+                else {
+                    byId('demo-account-actions').style.display = ENABLE_DEMO_ACCOUNTS ? 'flex' : 'none';
+                    await loadBackendState();
+                }
+            } catch (error) {
+                backendError('Connecting to Supabase', error);
+            }
+            supabaseClient.auth.onAuthStateChange((_event, session) => {
+                if (session && !currentSession.role) restoreBackendSession(session).catch(error => backendError('Restoring session', error));
+            });
+            setupCustomSignupSelects();
+            setupSignupValidation();
+        }
+        initializeApplication();
     </script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "ritwickdey.LiveServer",
+    "bradlc.vscode-tailwindcss",
+    "supabase.supabase"
+  ],
+  "unwantedRecommendations": []
+}
