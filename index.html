@@ -2003,6 +2003,10 @@
         let lastEnrollmentKey = null;
         let memoryStorageFallback = {};
         let realtimeChannels = [];
+        let backendRestorePromise = null;
+        let restoredBackendSessionId = null;
+        let signupSubmitting = false;
+        let signupCooldownTimer = null;
 
         // Safe Storage Helpers (Prevents SecurityError in sandboxed iframes or file:// contexts)
         function safeGetItem(key) {
@@ -2618,9 +2622,10 @@
                 const profile = students.find(s => s.studentId === currentSession.userId);
                 const authUser = (await supabaseClient.auth.getUser()).data.user;
                 if (authUser) {
+                    const dateOfBirth = /^\d{4}-\d{2}-\d{2}$/.test(profileData.dob || '') ? profileData.dob : null;
                     await supabaseQuery(supabaseClient.from('student_profile_data').upsert({
                         profile_id: authUser.id, first_name: profileData.fname, middle_name: profileData.mname,
-                        last_name: profileData.lname, phone: profileData.phone, date_of_birth: profileData.dob || null,
+                        last_name: profileData.lname, phone: profileData.phone, date_of_birth: dateOfBirth,
                         campus: profileData.campus, address: profileData.address, guardian: profileData.guardian,
                         avatar_url: profileData.avatar, medical_cleared: medicalCleared
                     }, { onConflict: 'profile_id' }), 'Saving profile data');
@@ -2866,6 +2871,11 @@
         function showToast(message, type = 'success') {
             const container = byId('toast-container');
             if (!container) return;
+            const toastKey = `${type}:${message}`;
+            const now = Date.now();
+            if (showToast.lastKey === toastKey && now - showToast.lastAt < 1200) return;
+            showToast.lastKey = toastKey;
+            showToast.lastAt = now;
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             const iconMap = { success: 'check_circle', warning: 'warning', error: 'error', info: 'info' };
@@ -3133,8 +3143,43 @@
             showToast(msg, 'error');
         }
         function clearSignupError() { const el = byId('signup-error'); if (el) el.style.display = 'none'; }
+        function setSignupSubmitting(submitting, label) {
+            const button = byId('su-submit-btn');
+            signupSubmitting = submitting;
+            if (!button) return;
+            button.disabled = submitting;
+            button.setAttribute('aria-busy', String(submitting));
+            if (label) button.innerText = label;
+        }
+        function startSignupCooldown(seconds) {
+            const button = byId('su-submit-btn');
+            if (signupCooldownTimer) clearInterval(signupCooldownTimer);
+            let remaining = seconds;
+            setSignupSubmitting(true, `Try again in ${remaining}s`);
+            signupCooldownTimer = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(signupCooldownTimer);
+                    signupCooldownTimer = null;
+                    setSignupSubmitting(false, signupType === 'admin' ? 'Create Administrator Account' : 'Create Student Account');
+                    return;
+                }
+                if (button) button.innerText = `Try again in ${remaining}s`;
+            }, 1000);
+        }
+        function formatSignupAuthError(message) {
+            const normalized = String(message || '').toLowerCase();
+            if (normalized.includes('rate limit') || normalized.includes('email rate')) {
+                return 'Please wait a moment before trying again.';
+            }
+            if (normalized.includes('already registered') || normalized.includes('already been registered')) {
+                return 'That email is already registered. Use Log in or Forgot password instead.';
+            }
+            return message || 'We could not create the account. Please try again.';
+        }
         async function handleSignupSubmit(e) {
             e.preventDefault();
+            if (signupSubmitting) return;
             clearSignupError();
             const val = id => (byId(id).value || '').trim();
             const first = val('su-first'), mid = val('su-mid'), last = val('su-last'), email = val('su-email');
@@ -3155,27 +3200,37 @@
             const midInit = mid ? mid.charAt(0).toUpperCase() + '. ' : '';
             const fullName = `${first} ${midInit}${last}`;
             if (BACKEND_MODE) {
+                setSignupSubmitting(true, 'Creating account...');
                 const studentId = val('su-id') || `2026${Math.floor(1000 + Math.random() * 9000)}`;
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email, password: pass,
-                    options: { data: { student_id: signupType === 'admin' ? null : studentId, username: signupType === 'admin' ? val('su-username') : null, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact, avatar_url: signupAvatarData || '', admin_signup_code: signupType === 'admin' ? val('su-code') : null } }
-                });
-                if (error) { signupError(escapeHtml(error.message)); return; }
-                if (signupType === 'admin') {
-                    const code = val('su-code');
-                    if (data.session) {
-                        const claim = await supabaseClient.rpc('claim_admin_signup_code', { p_code: code, p_user_id: data.user?.id });
-                        if (claim.error || !claim.data) { signupError('The account was created, but the access code was invalid or already used. Contact an administrator.'); return; }
+                try {
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email, password: pass,
+                        options: { data: { student_id: signupType === 'admin' ? null : studentId, username: signupType === 'admin' ? val('su-username') : null, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact, avatar_url: signupAvatarData || '', admin_signup_code: signupType === 'admin' ? val('su-code') : null } }
+                    });
+                    if (error) {
+                        const message = formatSignupAuthError(error.message);
+                        signupError(message);
+                        if (/rate.?limit|email rate/i.test(error.message || '')) startSignupCooldown(60);
+                        return;
                     }
+                    if (signupType === 'admin') {
+                        const code = val('su-code');
+                        if (data.session) {
+                            const claim = await supabaseClient.rpc('claim_admin_signup_code', { p_code: code, p_user_id: data.user?.id });
+                            if (claim.error || !claim.data) { signupError('The account was created, but the access code was invalid or already used. Contact an administrator.'); return; }
+                        }
+                    }
+                    if (data.session) showLogin('Account created. You can now log in.');
+                    else {
+                        byId('signup-view').style.display = 'none';
+                        byId('email-confirm-view').style.display = 'flex';
+                        byId('email-confirm-message').innerText = `We sent a confirmation link to ${email}. Confirm it before logging in.`;
+                    }
+                    byId('login-id').value = email;
+                    byId('login-pass').value = '';
+                } finally {
+                    if (!signupCooldownTimer) setSignupSubmitting(false, signupType === 'admin' ? 'Create Administrator Account' : 'Create Student Account');
                 }
-                if (data.session) showLogin('Account created. You can now log in.');
-                else {
-                    byId('signup-view').style.display = 'none';
-                    byId('email-confirm-view').style.display = 'flex';
-                    byId('email-confirm-message').innerText = `We sent a confirmation link to ${email}. Confirm it before logging in.`;
-                }
-                byId('login-id').value = email;
-                byId('login-pass').value = '';
                 return;
             }
             if (signupType === 'admin') {
@@ -3265,6 +3320,9 @@
         }
         async function restoreBackendSession(session) {
             if (!session?.user || !supabaseClient) return;
+            if (restoredBackendSessionId === session.user.id && currentSession.role) return;
+            if (backendRestorePromise) return backendRestorePromise;
+            backendRestorePromise = (async () => {
             let profile = await supabaseQuery(supabaseClient.from('profiles').select('*').eq('id', session.user.id).single(), 'Loading account profile');
             const pendingAdminCode = session.user.user_metadata?.admin_signup_code;
             if (pendingAdminCode && profile.role === 'student') {
@@ -3289,7 +3347,16 @@
                 const student = students.find(item => item.userId === profile.id || item.studentId === profile.student_id);
                 enterStudentPortal(student || { studentId: profile.student_id || profile.id, fullName: profile.full_name || session.user.email, email: session.user.email });
             }
-            showToast(`Welcome, ${escapeHtml(profile.full_name || session.user.email)}!`, 'success');
+            restoredBackendSessionId = session.user.id;
+            if (profile.role === 'admin' || profile.role === 'super_admin') {
+                showToast(`Welcome, ${escapeHtml(profile.full_name || session.user.email)}!`, 'success');
+            }
+            })();
+            try {
+                await backendRestorePromise;
+            } finally {
+                backendRestorePromise = null;
+            }
         }
         function setDemoBadge(isDemo) {
             document.querySelectorAll('.demo-account-badge').forEach(el => el.remove());
@@ -4103,6 +4170,8 @@
                 await supabaseClient.auth.signOut();
             }
             currentSession = { role: null, userId: null, name: null };
+            restoredBackendSessionId = null;
+            backendRestorePromise = null;
             profileData = {};
             notifications = [];
             medicalCleared = false;
