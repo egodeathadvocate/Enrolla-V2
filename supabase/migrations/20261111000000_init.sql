@@ -166,6 +166,16 @@ create table if not exists public.student_profile_data (
   updated_at timestamptz not null default timezone('utc', now())
 );
 
+create table if not exists public.admin_signup_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  created_by uuid not null references public.profiles(id) on delete cascade,
+  used_at timestamptz,
+  used_by uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default timezone('utc', now())
+);
+create index if not exists admin_signup_codes_active_idx on public.admin_signup_codes(code) where used_at is null;
+
 do $$
 declare
   t text;
@@ -196,6 +206,51 @@ as $$
   select exists (select 1 from public.profiles where id = auth.uid() and role = 'super_admin' and is_active);
 $$;
 
+create or replace function public.generate_admin_signup_code()
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  generated_code text;
+begin
+  if not public.is_admin() then
+    raise exception 'Only an administrator can generate access codes';
+  end if;
+  generated_code := 'ENR-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10));
+  insert into public.admin_signup_codes(code, created_by) values (generated_code, auth.uid());
+  return generated_code;
+end;
+$$;
+
+create or replace function public.claim_admin_signup_code(p_code text, p_user_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  claimed boolean;
+begin
+  if auth.uid() is null or auth.uid() <> p_user_id then
+    raise exception 'The access code can only be claimed by the signed-in account';
+  end if;
+  update public.admin_signup_codes
+  set used_at = timezone('utc', now()), used_by = p_user_id
+  where code = upper(trim(p_code)) and used_at is null
+  returning true into claimed;
+  if not coalesce(claimed, false) then return false; end if;
+  perform set_config('app.admin_signup_claim', 'true', true);
+  update public.profiles set role = 'admin' where id = p_user_id;
+  return true;
+end;
+$$;
+revoke all on function public.generate_admin_signup_code() from public;
+grant execute on function public.generate_admin_signup_code() to authenticated;
+revoke all on function public.claim_admin_signup_code(text, uuid) from public;
+grant execute on function public.claim_admin_signup_code(text, uuid) to authenticated;
+
 create or replace function public.email_for_login(identifier text)
 returns text
 language sql
@@ -220,6 +275,7 @@ begin
   if new.role is distinct from old.role
      and coalesce(auth.role(), '') <> 'service_role'
      and session_user not in ('postgres', 'supabase_admin')
+     and coalesce(current_setting('app.admin_signup_claim', true), '') <> 'true'
      and not public.is_super_admin() then
     raise exception 'Only a super administrator can change profile roles';
   end if;
@@ -269,6 +325,7 @@ alter table public.special_requests enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.notifications enable row level security;
 alter table public.student_profile_data enable row level security;
+alter table public.admin_signup_codes enable row level security;
 
 drop policy if exists programs_read on public.programs;
 create policy programs_read on public.programs for select to authenticated using (true);
@@ -332,6 +389,9 @@ drop policy if exists student_data_read on public.student_profile_data;
 create policy student_data_read on public.student_profile_data for select to authenticated using (profile_id = auth.uid() or public.is_admin());
 drop policy if exists student_data_write on public.student_profile_data;
 create policy student_data_write on public.student_profile_data for all to authenticated using (profile_id = auth.uid() or public.is_admin()) with check (profile_id = auth.uid() or public.is_admin());
+
+drop policy if exists admin_signup_codes_admin_read on public.admin_signup_codes;
+create policy admin_signup_codes_admin_read on public.admin_signup_codes for select to authenticated using (public.is_admin());
 
 do $$
 declare
