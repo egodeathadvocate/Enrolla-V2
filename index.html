@@ -3212,7 +3212,7 @@
                     if (error) {
                         const message = formatSignupAuthError(error.message);
                         signupError(message);
-                        if (/rate.?limit|email rate/i.test(error.message || '')) startSignupCooldown(60);
+                        if (/rate.?limit|email rate/i.test(error.message || '')) startSignupCooldown(5);
                         return;
                     }
                     if (signupType === 'admin') {
@@ -3325,7 +3325,29 @@
             if (restoredBackendSessionId === session.user.id && currentSession.role) return;
             if (backendRestorePromise) return backendRestorePromise;
             backendRestorePromise = (async () => {
-            let profile = await supabaseQuery(supabaseClient.from('profiles').select('*').eq('id', session.user.id).single(), 'Loading account profile');
+            const metadata = session.user.user_metadata || {};
+            let profileQuery = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+            if (profileQuery.error) throw profileQuery.error;
+            let profile = profileQuery.data;
+            if (!profile) {
+                const profileInsert = await supabaseClient.from('profiles').upsert({
+                    id: session.user.id,
+                    email: session.user.email || '',
+                    full_name: metadata.full_name || session.user.email?.split('@')[0] || 'Student',
+                    student_id: metadata.student_id || null,
+                    username: metadata.username || null,
+                    program_code: metadata.program || null,
+                    year_level: metadata.year_level || null,
+                    role: 'student'
+                }, { onConflict: 'id' }).select('*').single();
+                if (profileInsert.error) throw profileInsert.error;
+                profile = profileInsert.data;
+                await supabaseClient.from('student_profile_data').upsert({
+                    profile_id: session.user.id,
+                    phone: metadata.contact || null,
+                    avatar_url: metadata.avatar_url || null
+                }, { onConflict: 'profile_id' });
+            }
             const pendingAdminCode = session.user.user_metadata?.admin_signup_code;
             if (pendingAdminCode && profile.role === 'student') {
                 const claim = await supabaseClient.rpc('claim_admin_signup_code', { p_code: pendingAdminCode, p_user_id: session.user.id });
