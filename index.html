@@ -576,6 +576,34 @@
         .student-program-subjects { display:flex; flex-wrap:wrap; gap:5px; }
         .student-program-subjects span { padding:4px 7px; border-radius:7px; background:#F1F5F9; color:#475569; font-size:.61rem; font-weight:600; }
         .clearance-process-note { margin-top:1rem; padding:10px 12px; border:1px solid #FDE68A; border-radius:10px; background:#FFFBEB; color:#92400E; font-size:.67rem; line-height:1.55; }
+
+        /* Student Subjects tab: card layout mirrors the admin Manage Programs cards */
+        #subjects .catalog-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:1.1rem; align-items:stretch; }
+        .subject-card { display:flex; flex-direction:column; justify-content:space-between; gap:12px; min-width:0; padding:1.2rem 1.25rem; border:1px solid var(--border-color); border-radius:16px; background:#fff; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .2s, box-shadow .2s, border-color .2s; }
+        .subject-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); border-color:#C7D2FE; }
+        .subject-card:focus-visible { outline:3px solid #A5B4FC; outline-offset:2px; }
+        .subject-card.is-enrolled { border-color:#A7F3D0; box-shadow:0 0 0 2px #ECFDF5; }
+        .subject-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+        .subject-card .program-code { display:inline-block; background:#6366F1; color:#fff; font-size:.701rem; margin-bottom:4px; }
+        .subject-card h3 { font-size:.88rem; line-height:1.4; color:#1E293B; }
+        .subject-card-desc { font-size:.69rem; line-height:1.55; color:#475569; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .subject-card-tags { display:flex; flex-wrap:wrap; gap:4px; }
+        .subject-card-details { display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; padding:10px 12px; border-radius:10px; background:#F8FAFC; border:1px solid #F1F5F9; font-size:.66rem; color:#334155; }
+        .subject-card-details span { display:block; color:var(--text-muted); font-size:.58rem; font-weight:600; margin-bottom:1px; }
+        .subject-card-details .span-2 { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .subject-card-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; border-top:1px solid #F1F5F9; padding-top:12px; }
+        .subject-card-footer .units { font-size:.69rem; color:var(--text-muted); }
+        .subject-card-footer .units strong { color:#1E293B; }
+        .pill-full { background:#FEE2E2; color:#991B1B; }
+        @media (max-width: 560px) { #subjects .catalog-grid { grid-template-columns:1fr; } .subject-card-details { grid-template-columns:1fr; } }
+
+        /* Special request structured format */
+        .req-format-box { border:1px dashed #C7D2FE; border-radius:12px; padding:12px 14px; background:#FAFAFF; }
+        .req-format-box h4 { font-size:.72rem; color:#3730A3; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+        .req-format-box .modal-field { margin-bottom:10px; }
+        .req-format-box .modal-field:last-child { margin-bottom:0; }
+        .req-format-box small { display:block; margin-top:4px; color:#64748B; font-size:.61rem; line-height:1.45; }
+        .req-reason, .req-reason-full { white-space:pre-line; }
         .request-example-note { display:block; margin-top:6px; color:#64748B; font-size:.64rem; line-height:1.5; }
         .study-plan-modal-box { max-width:1040px; width:min(1040px,100%); }
         .study-plan-intro { margin:-.55rem 0 1rem; font-size:.72rem; color:var(--text-muted); }
@@ -1256,12 +1284,12 @@
               <button class="filter-pill" onclick="setCatalogFilter('Gen Ed')">Gen Ed</button>
             </div>
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <select id="catalog-department-filter" class="search-bar" style="width:auto; min-width:190px; padding-left:14px;" onchange="renderCatalog()" aria-label="Filter subjects by department">
+              <select id="catalog-department-filter" class="search-bar" style="width:auto; min-width:190px; padding-left:14px;" onchange="catalogPage=1; renderCatalog()" aria-label="Filter subjects by department">
                 <option value="ALL">All Departments</option>
               </select>
               <div class="search-bar-wrap">
                 <span class="material-symbols-outlined">search</span>
-                <input type="text" id="catalog-search" class="search-bar" placeholder="Search all departments..." oninput="renderCatalog()">
+                <input type="text" id="catalog-search" class="search-bar" placeholder="Search all departments..." oninput="catalogPage=1; renderCatalog()">
               </div>
             </div>
           </div>
@@ -1269,6 +1297,7 @@
           <div class="catalog-grid" id="catalog-list">
             <!-- Injected by JS -->
           </div>
+          <div class="pagination-bar" id="catalog-pagination"></div>
         </div>
 
         <!-- --- STUDENT PROGRAM DIRECTORY --- -->
@@ -1480,8 +1509,12 @@
                   <div class="modal-field full-width"><div id="req-type-hint" class="req-hint"></div></div>
                   <div class="modal-field full-width" id="req-subject-wrap"><label>Subject *</label><select id="req-subject"></select></div>
                   <div class="modal-field full-width" id="req-units-wrap"><label>Requested Total Units (25 to 30) *</label><input type="number" id="req-units" min="25" max="30" value="27"></div>
-                  <div class="modal-field full-width">
-                    <label>Reason / Justification *</label><textarea id="req-reason" rows="5" maxlength="500" placeholder="Example: I am requesting [specific action] for [subject / term]. This is needed because [brief reason]. Supporting details: [documents or relevant context]." required></textarea><small class="request-example-note">Suggested format: Situation → Specific request → Reason → Supporting details. Keep the explanation clear and factual.</small>
+                  <div class="modal-field full-width req-format-box">
+                    <h4><span class="material-symbols-outlined" style="font-size:17px;">assignment</span> Request details</h4>
+                    <div class="modal-field"><label for="req-situation">1. Current situation *</label><input type="text" id="req-situation" maxlength="160" placeholder=""><small id="req-situation-hint">Describe where you stand now, e.g. your current units, section, or status.</small></div>
+                    <div class="modal-field"><label for="req-action">2. Specific request *</label><input type="text" id="req-action" maxlength="160" placeholder=""><small>State exactly what you want the Registrar to approve.</small></div>
+                    <div class="modal-field"><label for="req-reason">3. Reason / justification *</label><textarea id="req-reason" rows="4" maxlength="400" placeholder=""></textarea><small>Explain why this is needed. Keep it clear and factual.</small></div>
+                    <div class="modal-field"><label for="req-docs">4. Supporting documents (optional)</label><input type="text" id="req-docs" maxlength="160" placeholder="e.g. Medical certificate, approved study plan, adviser's note"><small>List documents you can present to the Registrar if asked.</small></div>
                   </div>
                 </div>
                 <button type="submit" class="btn-primary-solid"><span class="material-symbols-outlined" style="font-size:18px;">send</span> Submit Request</button>
@@ -1882,7 +1915,7 @@
           <h3><span class="material-symbols-outlined" style="color:#6366F1;">lock_reset</span> Reset Password</h3>
           <button class="modal-close" onclick="closeModal('forgot-modal')"><span class="material-symbols-outlined">close</span></button>
         </div>
-        <p style="font-size:0.752rem; color:var(--text-muted); margin-bottom:1.25rem;">Enter your Student ID Number or Institutional Email (`@naga.edu.ph`) and we will send a temporary password reset link.</p>
+        <p style="font-size:0.752rem; color:var(--text-muted); margin-bottom:1.25rem;">Enter your Student ID Number or the email address you signed up with (e.g. yourname@gmail.com) and we will send a password reset link.</p>
         <div class="form-group"><label>Student ID or Institutional Email</label> <input type="text" id="reset-input" placeholder="e.g. 12345678"></div>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
           <button class="btn-primary-outline" onclick="closeModal('forgot-modal')">Cancel</button> <button class="btn-primary-solid" onclick="handlePasswordReset()">Send Reset Link</button>
@@ -1943,7 +1976,7 @@
           <div class="modal-form-grid">
             <div class="modal-field"><label>Student ID *</label> <input type="text" id="stu-form-id" placeholder="e.g. 20261009" required></div>
             <div class="modal-field"><label>Full Name *</label> <input type="text" id="stu-form-name" placeholder="e.g. Juan M. Dela Cruz" required></div>
-            <div class="modal-field"><label>Email Address *</label> <input type="email" id="stu-form-email" placeholder="student@naga.edu.ph" required></div>
+            <div class="modal-field"><label>Email Address *</label> <input type="email" id="stu-form-email" placeholder="example@gmail.com" required></div>
             <div class="modal-field"><label>Contact Number *</label> <input type="text" id="stu-form-contact" placeholder="+63 917 000 0000" required></div>
             <div class="modal-field"><label>Academic Program *</label> <select id="stu-form-program" required></select></div>
             <div class="modal-field">
@@ -2181,13 +2214,10 @@
     <!-- JAVASCRIPT LOGIC (RELATIONAL DB + PORTAL + ADMIN) -->
     <script>
         // ===== FORK SETUP: paste your Supabase values here =====
-        const DCISM_API_BASE = '/dcism-api';
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://eczeqokslwxegmgvmspp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_KO-sJHiJKOmrSh6THCuu0g_QlzvdRPK';
         const ENABLE_DEMO_ACCOUNTS = true;
-        const DCISM_MODE = true;
-        let dcismOnline = DCISM_MODE;
-        const BACKEND_MODE = !DCISM_MODE && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+        const BACKEND_MODE = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
         const supabaseClient = BACKEND_MODE && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         // shorthand used throughout the script
         const byId = id => document.getElementById(id);
@@ -2234,7 +2264,7 @@
             const banner = document.createElement('div');
             banner.id = 'demo-mode-banner';
             banner.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:500;max-width:calc(100% - 24px);padding:10px 14px;border:1px solid #FDE68A;border-radius:10px;background:#FFFBEB;color:#92400E;font-size:12px;box-shadow:0 6px 18px rgba(15,23,42,.12);display:flex;align-items:center;gap:12px;';
-            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. Connect the DCISM PHP API to enable shared data.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
+            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. Configure Supabase to enable shared data.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
             document.body.appendChild(banner);
         }
         function backendError(context, error) {
@@ -2269,6 +2299,8 @@
         let studentProgramPage = 1;
         const STUDENT_PROGRAMS_PER_PAGE = 6;
         let studentCatalogProgramScope = null;
+        let catalogPage = 1;
+        const CATALOG_PER_PAGE = 6;
         let studyPlanSelection = [];
         let studyPlanIsEditing = false;
 
@@ -2714,89 +2746,6 @@
         let specialRequests = [];
 
         // STATE PERSISTENCE
-        async function dcismRequest(path, options = {}) {
-            const response = await fetch(`${DCISM_API_BASE}/${path}`, {
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-                ...options
-            });
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok || payload.ok === false) throw new Error(payload.error || 'DCISM request failed.');
-            return payload;
-        }
-        async function loadDcismState() {
-            const payload = await dcismRequest('state.php');
-            const state = payload.state || {};
-            programs = (state.programs || []).map(p => ({ ...p, subjectCodes: p.subject_codes || [] }));
-            courses = (state.courses || []).map(c => ({
-                ...c, id: c.id, code: c.code, name: c.name, title: c.title || `${c.code} - ${c.name}`,
-                desc: c.description || '', programCode: c.program_code, maxCapacity: Number(c.max_capacity),
-                enrolledCount: Number(c.enrolled_count || 0), scheduleText: c.schedule_text, details: c.details || '',
-                startHour: Number(c.start_hour), duration: Number(c.duration), type: c.course_type,
-                prereq: c.prerequisite || '', topics: c.topics || [], status: 'available'
-            }));
-            const setting = state.settings?.[0];
-            enrollmentSettings = setting ? {
-                ...setting, mode: setting.mode === 'automatic' ? 'auto' : setting.mode,
-                startDateTime: setting.start_date_time, endDateTime: setting.end_date_time,
-                manualStatus: setting.manual_status, academicYear: setting.academic_year
-            } : { ...DEFAULT_SETTINGS };
-            const profileRows = state.profiles || [];
-            const profileById = new Map(profileRows.map(p => [p.id, p]));
-            enrollments = (state.enrollments || []).map(e => ({
-                ...e, studentId: profileById.get(e.student_id)?.student_id || e.student_id,
-                subjectCode: e.subject_code || '', courseId: e.course_id, programCode: e.program_code,
-                dateSubmitted: e.date_submitted || e.created_at
-            }));
-            specialRequests = (state.requests || []).map(r => ({
-                ...r, studentId: profileById.get(r.student_id)?.student_id || r.student_id,
-                subjectCode: r.subject_code || '', dateSubmitted: r.date_submitted || r.created_at,
-                adminRemark: r.admin_remark, decidedBy: r.decided_by, decidedAt: r.decided_at
-            }));
-            students = profileRows.filter(p => p.role === 'student').map(p => ({
-                id: p.id, userId: p.id, studentId: p.student_id || p.id, fullName: p.full_name || 'Student',
-                email: p.email || '', contact: p.contact || 'Not provided', programCode: p.program_code || '',
-                yearLevel: p.year_level || '', enrollmentStatus: p.enrollment_status || 'Not Enrolled',
-                registeredOn: p.created_at, isDemo: !!p.is_demo
-            }));
-            admins = profileRows.filter(p => p.role === 'admin' || p.role === 'super_admin').map(p => ({
-                id: p.id, userId: p.id, username: p.username || p.email, email: p.email,
-                fullName: p.full_name || 'Administrator', role: p.role, isDemo: !!p.is_demo
-            }));
-            auditLogs = state.auditLogs || [];
-            const dataRow = state.profileData;
-            if (dataRow) {
-                profileData = {
-                    fname: dataRow.first_name || '', mname: dataRow.middle_name || '', lname: dataRow.last_name || '',
-                    email: profileRows.find(p => p.id === currentSession.authUserId)?.email || '',
-                    phone: dataRow.phone || '', dob: dataRow.date_of_birth || '', campus: dataRow.campus || '',
-                    address: dataRow.address || '', guardian: dataRow.guardian || '', avatar: dataRow.avatar_url || ''
-                };
-                medicalCleared = !!dataRow.medical_cleared;
-            }
-            notifications = (state.notifications || []).map(n => ({ ...n, target: n.target || 'dashboard' }));
-            syncStudentCoursesWithEnrollments();
-        }
-        async function restoreDcismSession(user) {
-            currentSession = {
-                role: user.role, userId: user.student_id || user.id, authUserId: user.id,
-                name: user.full_name || user.email, isDemo: !!user.is_demo
-            };
-            await loadDcismState();
-            setupCustomSignupSelects();
-            if (user.role === 'admin' || user.role === 'super_admin') {
-                byId('login-view').style.display = 'none';
-                byId('signup-view').style.display = 'none';
-                byId('app-view').style.display = 'none';
-                byId('admin-view').style.display = 'flex';
-                byId('admin-sidebar-user').innerText = user.full_name || user.email;
-                setDemoBadge(!!user.is_demo);
-                navigateAdmin('admin-dashboard');
-            } else {
-                const student = students.find(item => item.userId === user.id || item.studentId === user.student_id);
-                enterStudentPortal(student || { studentId: user.student_id || user.id, fullName: user.full_name || user.email, email: user.email });
-            }
-        }
         async function loadBackendState() {
             const [programRows, courseRows, enrollmentRows, requestRows, profileRows] = await Promise.all([
                 supabaseQuery(supabaseClient.from('programs').select('*').order('code'), 'Loading programs'),
@@ -2881,10 +2830,6 @@
             syncStudentCoursesWithEnrollments();
         }
         async function loadState() {
-            if (DCISM_MODE && dcismOnline) {
-                await loadDcismState();
-                return;
-            }
             if (BACKEND_MODE) {
                 await loadBackendState();
                 return;
@@ -3846,7 +3791,7 @@
         async function signInDemoAccount(kind) {
             if (!ENABLE_DEMO_ACCOUNTS) return;
             const email = kind === 'admin' ? 'admin.demo@enrolla.test' : 'student.demo@enrolla.test';
-            if (DCISM_MODE || !BACKEND_MODE) {
+            if (!BACKEND_MODE) {
                 byId('login-id').value = kind === 'admin' ? email : '12345678';
                 byId('login-pass').value = 'Demo@12345';
                 await handleLoginSubmit();
@@ -3884,21 +3829,7 @@
             const identifier = (byId('login-id').value || '').trim();
             const rawPass = byId('login-pass').value || '';
             if (!identifier || !rawPass) {
-                showToast('Please enter your email or Student ID and password.', 'warning');
-                return false;
-            }
-            if (DCISM_MODE && dcismOnline) {
-                try {
-                    const payload = await dcismRequest('login.php', {
-                        method: 'POST',
-                        body: JSON.stringify({ identifier, password: rawPass })
-                    });
-                    await restoreDcismSession(payload.user);
-                    byId('login-pass').value = '';
-                } catch (error) {
-                    byId('login-pass').value = '';
-                    showToast(error.message || 'Incorrect email, Student ID, or password.', 'error');
-                }
+                showToast('Please enter your username or ID number and password.', 'warning');
                 return false;
             }
             if (BACKEND_MODE) {
@@ -4446,6 +4377,7 @@
             if (!program) return;
             studentCatalogProgramScope = programCode;
             activeCatalogFilter = 'All';
+            catalogPage = 1;
             const search = byId('catalog-search');
             if (search) search.value = '';
             const department = byId('catalog-department-filter');
@@ -4497,6 +4429,7 @@
         // CATALOG FILTER & RENDERER        // CATALOG FILTER & RENDERER
         function setCatalogFilter(category) {
             studentCatalogProgramScope = null;
+            catalogPage = 1;
             activeCatalogFilter = category;
             document.querySelectorAll('#catalog-filter-pills .filter-pill').forEach(btn => {
                 if (btn.innerText.includes(category) || (category === 'All' && btn.innerText.includes('All'))) {
@@ -4583,39 +4516,60 @@
                 const matchesQuery = !query || haystack.includes(query);
                 return matchesCat && matchesDepartment && matchesProgramScope && matchesQuery;
             });
+            const totalPages = Math.max(1, Math.ceil(filtered.length / CATALOG_PER_PAGE));
+            catalogPage = Math.min(Math.max(1, catalogPage), totalPages);
+            const pageItems = filtered.slice((catalogPage - 1) * CATALOG_PER_PAGE, catalogPage * CATALOG_PER_PAGE);
             if (filtered.length === 0) {
-                catalog.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:2.5rem;">No courses match your current filter.</div>`;
+                catalog.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:2.5rem;">No subjects match your current filter. Clear the search or choose All Subjects.</div>`;
+                renderPaginationBar('catalog-pagination', 0, 1, 1, 'setCatalogPage');
                 return;
             }
-            filtered.forEach(c => {
+            catalog.innerHTML = pageItems.map(c => {
                 const isEnrolled = c.status === 'enrolled';
                 const pendingDrop = isEnrolled && getPendingDropRequest(currentSession.userId, c.code);
                 const isFull = c.enrolledCount >= c.maxCapacity;
                 const badgeClass = getTypeBadgeClass(c.type);
-                catalog.innerHTML += ` <div class="catalog-card" onclick="openCourseModal('${c.id}')">
-                    <div class="cat-subject">
-                        <div class="cat-header"><div class="cat-title"><h3>${c.title}</h3></div></div>
-                        <div class="cat-meta-badges"><span class="badge ${badgeClass}">${c.programCode || 'BSIT'} • ${c.type}</span>
-                        <span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(c))}</span>
-                        <span class="badge ${isEnrolled ? 'badge-enrolled' : (isFull ? 'badge-core' : 'badge-available')}">${pendingDrop ? 'Drop Pending' : (isEnrolled ? 'Enrolled' :
-                    (isFull ? 'Full (' + c.enrolledCount + '/' + c.maxCapacity + ')' : 'Available (' + c.enrolledCount + '/' + c.maxCapacity + ')'))}</span></div>
+                const code = c.code || String(c.title || '').split('-')[0].trim();
+                const name = c.name || String(c.title || '').split('-').slice(1).join('-').trim() || c.title;
+                const pillClass = pendingDrop ? 'pill-pending' : (isEnrolled ? 'pill-enrolled' : (isFull ? 'pill-full' : 'pill-open'));
+                const pillText = pendingDrop ? 'Drop Pending' : (isEnrolled ? 'Enrolled' : (isFull ? `Full ${c.enrolledCount}/${c.maxCapacity}` : `${c.enrolledCount}/${c.maxCapacity} Slots`));
+                return `<article class="subject-card ${isEnrolled ? 'is-enrolled' : ''}" tabindex="0" onclick="openCourseModal('${c.id}')" onkeydown="if(event.key==='Enter'&&event.target===this) openCourseModal('${c.id}')">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                      <div class="subject-card-top">
+                        <div style="min-width:0;"><span class="badge program-code">${escapeHtml(code)}</span><h3>${escapeHtml(name)}</h3></div>
+                        <span class="status-pill ${pillClass}">${pillText}</span>
+                      </div>
+                      <div class="subject-card-tags"><span class="badge ${badgeClass}">${escapeHtml(c.type || 'Subject')}</span><span class="badge badge-available">${escapeHtml(c.programCode || 'BSIT')}</span><span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(c))}</span></div>
+                      <p class="subject-card-desc">${escapeHtml(c.desc || 'No subject description available.')}</p>
+                      <div class="subject-card-details">
+                        <div class="span-2"><div><span>Schedule</span>${escapeHtml(c.scheduleText || 'TBA')}</div>
+                          <button class="schedule-more-btn" aria-label="Show conflicting schedules" aria-expanded="false" onclick="event.stopPropagation(); toggleConflictSchedules('${c.id}', this)">+</button></div>
+                        <div><span>Room</span>${escapeHtml(c.room || 'TBA')}</div>
+                        <div><span>Instructor</span>${escapeHtml(c.instructor || 'TBA')}</div>
+                      </div>
+                      <div id="conflicts-${c.id}" class="conflict-schedules" onclick="event.stopPropagation()">
+                        <div class="conflict-schedules-head"><span class="material-symbols-outlined" style="font-size:17px;">calendar_view_week</span><span class="conflict-schedules-title">Other class schedules</span></div>
+                        <input class="conflict-schedules-search" type="search" aria-label="Search other class schedules" placeholder="Search class, schedule, building, or room..." oninput="renderConflictScheduleList('${c.id}', this.value)">
+                        <div id="conflict-list-${c.id}" class="conflict-schedule-list"></div>
+                      </div>
                     </div>
-                    <span class="cat-units">${c.units} Units</span>
-                    <div class="cat-schedule-box"><span class="material-symbols-outlined" style="font-size:16px; color:#6366F1;">schedule</span>
-                    <span>${c.scheduleText} • <strong>${c.room}</strong></span>
-                    <button class="schedule-more-btn" aria-label="Show conflicting schedules" aria-expanded="false" onclick="event.stopPropagation(); toggleConflictSchedules('${c.id}', this)">+</button></div>
-                    <div id="conflicts-${c.id}" class="conflict-schedules" onclick="event.stopPropagation()">
-                    <div class="conflict-schedules-head"><span class="material-symbols-outlined" style="font-size:17px;">calendar_view_week</span><span class="conflict-schedules-title">Other class schedules</span></div>
-                    <input class="conflict-schedules-search" type="search" aria-label="Search other class schedules" placeholder="Search class, schedule, building, or room..." oninput="renderConflictScheduleList('${c.id}', this.value)">
-                    <div id="conflict-list-${c.id}" class="conflict-schedule-list"></div></div>
-                    <div class="cat-footer"><span style="font-size:0.66rem; color:var(--text-muted); font-weight:500;">
-                    <span class="material-symbols-outlined" style="font-size:15px; vertical-align:middle;">person</span> ${c.instructor}</span>
-                    <div style="display:flex; gap:6px;">
-                    <button class="cat-action btn-action" style="background:#F1F5F9; color:#334155; padding:6px 10px; font-size:0.64rem;" onclick="event.stopPropagation(); openCourseModal('${c.id}')">Details</button>
-                    <button class="cat-action btn-action ${isEnrolled ? 'btn-drop' : 'btn-enroll'}" ${pendingDrop ? 'disabled' : ''} onclick="event.stopPropagation(); ${isEnrolled ? `startDropRequest('${c.id}')` : `toggleCourse('${c.id}')`}" style="padding:6px 10px; font-size:0.64rem;${pendingDrop ? ' opacity:.5; cursor:not-allowed;' : ''}">${pendingDrop ? 'Awaiting Admin' : (isEnrolled ? 'Request Drop' : (isFull ? 'Full' : 'Enroll'))}</button>
-                    </div></div></div> `;
-            });
+                    <div class="subject-card-footer">
+                      <span class="units"><strong>${c.units}</strong> Units</span>
+                      <div style="display:flex; gap:6px;">
+                        <button class="admin-btn admin-btn-sm program-action-edit" style="background:#F8FAFC; color:#475569; border:1px solid #E2E8F0;" onclick="event.stopPropagation(); openCourseModal('${c.id}')"><span class="material-symbols-outlined" style="font-size:15px;">info</span> Details</button>
+                        <button class="cat-action btn-action ${isEnrolled ? 'btn-drop' : 'btn-enroll'}" ${pendingDrop ? 'disabled' : ''} onclick="event.stopPropagation(); ${isEnrolled ? `startDropRequest('${c.id}')` : `toggleCourse('${c.id}')`}" style="padding:6px 12px; font-size:0.64rem;${pendingDrop ? ' opacity:.5; cursor:not-allowed;' : ''}">${pendingDrop ? 'Awaiting Admin' : (isEnrolled ? 'Request Drop' : (isFull ? 'Full' : 'Enroll'))}</button>
+                      </div>
+                    </div>
+                  </article>`;
+            }).join('');
+            renderPaginationBar('catalog-pagination', filtered.length, catalogPage, totalPages, 'setCatalogPage');
         }
+        function setCatalogPage(page) {
+            catalogPage = page;
+            renderCatalog();
+            byId('subjects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        window.setCatalogPage = setCatalogPage;
 
         // STATUS & TUITION RENDERER
         function renderStatusAndTuition(currentUnits) {
@@ -4862,11 +4816,7 @@
         function closeModal(id) { byId(id).classList.remove('open'); }
         async function logout(e) {
             if (e) e.stopPropagation();
-            if (!DCISM_MODE || !dcismOnline) saveState();
-            if (DCISM_MODE && dcismOnline) {
-                try { await dcismRequest('logout.php', { method: 'POST', body: '{}' }); }
-                catch (error) { console.error('[DCISM] Logout failed', error); }
-            }
+            saveState();
             if (BACKEND_MODE && supabaseClient) {
                 await cleanupRealtimeSubscriptions();
                 await supabaseClient.auth.signOut();
@@ -5923,6 +5873,31 @@
                 hint: 'Subject waiver, prerequisite exemption, change of program, or any other concern. The Registrar will reply with remarks.'
             }
         };
+        const REQUEST_FORMAT_EXAMPLES = {
+            'Subject Drop Request': { situation: 'e.g. Currently enrolled in this subject (3 units), 2nd week of classes', action: 'e.g. Drop this subject from my study load this semester', reason: 'e.g. I need to reduce my load due to a part-time work schedule that overlaps with this class.' },
+            'Late Enrollment': { situation: 'e.g. Enrollment closed before I completed my subjects', action: 'e.g. Allow me to enroll in my remaining program subjects', reason: 'e.g. I was unable to enroll on time because my clearance was still being processed.' },
+            'Unit Overload': { situation: 'e.g. Currently at 24 units, graduating next semester', action: 'e.g. Approve a total load of 27 units', reason: 'e.g. I need one more 3-unit subject to stay on track with my curriculum.' },
+            'Schedule Conflict Override': { situation: 'e.g. This subject overlaps with a class I already have', action: 'e.g. Allow me to enroll despite the schedule overlap', reason: 'e.g. The overlap is 30 minutes and both instructors have agreed to the arrangement.' },
+            'Full Subject Override': { situation: 'e.g. The only section offered for my program is full', action: 'e.g. Admit me to this subject as an additional slot', reason: 'e.g. It is a prerequisite for my next-semester subjects and no other section is available.' },
+            'Other Request': { situation: 'e.g. Briefly describe your current situation', action: 'e.g. Subject waiver, prerequisite exemption, change of program', reason: 'e.g. Explain why this request is needed.' }
+        };
+        function applyRequestFormatExamples(type) {
+            const ex = REQUEST_FORMAT_EXAMPLES[type] || REQUEST_FORMAT_EXAMPLES['Other Request'];
+            if (byId('req-situation')) byId('req-situation').placeholder = ex.situation;
+            if (byId('req-action')) byId('req-action').placeholder = ex.action;
+            if (byId('req-reason')) byId('req-reason').placeholder = ex.reason;
+        }
+        function composeRequestReason() {
+            const situation = (byId('req-situation')?.value || '').trim();
+            const action = (byId('req-action')?.value || '').trim();
+            const reason = (byId('req-reason')?.value || '').trim();
+            const docs = (byId('req-docs')?.value || '').trim();
+            return { situation, action, reason, docs,
+                text: `Situation: ${situation}\nRequest: ${action}\nReason: ${reason}\nSupporting documents: ${docs || 'None'}` };
+        }
+        function clearRequestFormatFields() {
+            ['req-situation', 'req-action', 'req-reason', 'req-docs'].forEach(id => { if (byId(id)) byId(id).value = ''; });
+        }
         function requestPillClass(status) {
             return { Pending: 'pill-pending', Approved: 'pill-approved', Rejected: 'pill-rejected', Cancelled: 'pill-cancelled' }[status] ||
                 'pill-pending';
@@ -5942,6 +5917,7 @@
             const type = byId('req-type').value;
             const cfg = REQUEST_TYPES[type];
             byId('req-type-hint').innerText = cfg.hint;
+            applyRequestFormatExamples(type);
             byId('req-subject-wrap').style.display = cfg.subject ? '' : 'none';
             byId('req-units-wrap').style.display = cfg.units ? '' : 'none';
             if (cfg.subject) {
@@ -5978,7 +5954,8 @@
             byId('req-type').value = 'Subject Drop Request';
             onRequestTypeChange();
             byId('req-subject').value = course.code;
-            byId('req-reason').focus();
+            if (!byId('req-action').value.trim()) byId('req-action').value = `Drop ${course.code} from my study load this semester`;
+            byId('req-situation').focus();
             showToast(`Drop request started for ${course.code}. Add your reason and submit it for Registrar approval. Your study load will not change while it is pending.`, 'info');
         }
         window.startDropRequest = startDropRequest;
@@ -6024,9 +6001,12 @@
             const sid = currentSession.userId;
             const type = byId('req-type').value;
             const cfg = REQUEST_TYPES[type];
-            const reason = byId('req-reason').value.trim();
-            if (reason.length < 15) { showToast('Please explain your request in at least 15 characters.', 'warning'); return; }
-            if (/[<>]/.test(reason)) { showToast('Please remove the characters < and > from your reason.', 'warning'); return; }
+            const parts = composeRequestReason();
+            if (!parts.situation) { showToast('Fill in your current situation (item 1).', 'warning'); byId('req-situation').focus(); return; }
+            if (!parts.action) { showToast('Fill in your specific request (item 2).', 'warning'); byId('req-action').focus(); return; }
+            if (parts.reason.length < 15) { showToast('Explain your reason in at least 15 characters (item 3).', 'warning'); byId('req-reason').focus(); return; }
+            const reason = parts.text;
+            if (/[<>]/.test(reason)) { showToast('Please remove the characters < and > from your request.', 'warning'); return; }
             let subjectCode = '', units = null;
             if (cfg.subject) {
                 subjectCode = byId('req-subject').value;
@@ -6068,7 +6048,7 @@
             specialRequests.unshift(req);
             logAdminAction('Requests', 'SUBMIT_REQUEST', `Student ${sid} submitted ${req.id} (${type}${subjectCode ? ' - ' + subjectCode : ''}).`);
             addNotification('contact_support', `${type} ${req.id} was submitted for Registrar approval.`, 'requests');
-            byId('req-reason').value = '';
+            clearRequestFormatFields();
             saveState();
             updateAllViews();
             renderStudentRequests();
@@ -6126,7 +6106,7 @@
             byId('req-decision-body').innerHTML = ` <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
                 <div><strong>Request:</strong> ${escapeHtml(r.id)}</div><div><strong>Status:</strong> ${escapeHtml(r.status)}</div> <div><strong>Student:</strong> ${escapeHtml(stu ?
                 stu.fullName : r.studentId)}</div><div><strong>ID:</strong> ${escapeHtml(r.studentId)}</div> <div><strong>Type:</strong> ${escapeHtml(r.type)}</div><div>${escapeHtml(requestDetailText(r))}</div>
-                </div> <div><strong>Reason:</strong><div style="margin-top:4px;">${escapeHtml(r.reason)}</div></div> ${decided ?
+                </div> <div><strong>Reason:</strong><div class="req-reason-full" style="margin-top:4px;">${escapeHtml(r.reason)}</div></div> ${decided ?
                 `<div style="margin-top:8px; color:var(--gray-600);">Decided by <strong>${escapeHtml(r.decidedBy ||
                 'admin')}</strong> on ${escapeHtml(r.decidedAt)}${r.adminRemark ? '. Remarks: ' + escapeHtml(r.adminRemark) : ''}</div>` : ''}`;
             byId('req-remark').value = '';
@@ -6196,20 +6176,6 @@
         // Initialize state on load
         async function initializeApplication() {
             if (ENABLE_DEMO_ACCOUNTS) byId('demo-account-actions').style.display = 'flex';
-            if (DCISM_MODE && dcismOnline) {
-                try {
-                    const payload = await dcismRequest('me.php');
-                    await restoreDcismSession(payload.user);
-                } catch {
-                    dcismOnline = false;
-                    showDemoModeBanner();
-                    loadState();
-                    showLogin();
-                }
-                setupCustomSignupSelects();
-                setupSignupValidation();
-                return;
-            }
             if (!BACKEND_MODE) {
                 showDemoModeBanner();
                 loadState();
