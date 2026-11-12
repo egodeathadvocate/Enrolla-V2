@@ -117,6 +117,112 @@
         .auth-error { background: #FEE2E2; color: #991B1B; margin: 0 0 1rem; }
         .auth-logo-side { display: flex; align-items: center; justify-content: center; }
         .enrolla-logo { width: 320px; max-width: 100%; height: auto; display: block; }
+
+        /* LOGIN SPLIT LAYOUT: form on the left, Enrolla branding on the right */
+        #login-view {
+            box-sizing: border-box;
+            min-height: 100vh;
+            min-height: 100svh;
+            padding: 1rem;
+            align-items: stretch;
+            justify-content: stretch;
+            background: #F7F7F7;
+        }
+        #login-view .auth-wrap {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            align-items: stretch;
+            justify-content: stretch;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: none;
+            min-height: calc(100vh - 2rem);
+            min-height: calc(100svh - 2rem);
+        }
+        #login-view .auth-form-side {
+            width: min(530px, calc(100% - 2.5rem));
+            max-width: 100%;
+            align-self: center;
+            justify-self: center;
+            padding: 2rem 0;
+        }
+        #login-view .auth-logo-side {
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 0;
+            min-height: calc(100vh - 2rem);
+            min-height: calc(100svh - 2rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 2rem;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+        }
+        #login-view .enrolla-logo {
+            width: min(380px, 82%);
+            height: auto;
+            filter: none;
+        }
+        #login-view .auth-brand-tagline {
+            margin: 0;
+            color: #64748B;
+            font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            text-align: center;
+        }
+        /* Subtle desktop divider between the login form and the logo */
+        #login-view .auth-wrap {
+            position: relative;
+        }
+        #login-view .auth-wrap::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 14%;
+            bottom: 14%;
+            width: 1px;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.06);
+            pointer-events: none;
+        }
+        @media (max-width: 780px) {
+            #login-view {
+                padding: 1rem;
+            }
+            #login-view .auth-wrap {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 1rem;
+                min-height: auto;
+            }
+            #login-view .auth-wrap::before {
+                display: none;
+            }
+            #login-view .auth-form-side {
+                width: min(530px, 100%);
+                padding: 2rem 0;
+            }
+            #login-view .auth-logo-side {
+                grid-row: 1;
+                min-height: 180px;
+                max-height: 240px;
+                padding: 1rem;
+                background: transparent;
+                border: 0;
+                border-radius: 0;
+            }
+            #login-view .auth-form-side {
+                grid-row: 2;
+            }
+            #login-view .enrolla-logo {
+                width: min(260px, 72%);
+            }
+        }
         #signup-view .auth-wrap { flex-direction: column; gap: 1.6rem; }
         #signup-view .auth-form-side { width: 560px; }
         #signup-view .enrolla-logo { width: 200px; }
@@ -460,7 +566,44 @@
            .conflict-schedule-row .conflict-detail { grid-column: 2; }
         }
 
-        /* SCHEDULE PAGE */
+
+        /* Student program directory and planner */
+        .student-programs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1rem; }
+        .student-program-card { display:flex; flex-direction:column; gap:.75rem; min-width:0; padding:1.2rem; border:1px solid var(--border-color); border-radius:16px; background:#fff; box-shadow:var(--shadow-sm); }
+        .student-program-card.is-own { border-color:#A5B4FC; box-shadow:0 0 0 2px #EEF2FF; }
+        .student-program-card h3 { font-size:.88rem; line-height:1.4; color:#1E293B; }
+        .student-program-card p { font-size:.69rem; color:var(--text-muted); line-height:1.55; }
+        .student-program-subjects { display:flex; flex-wrap:wrap; gap:5px; }
+        .student-program-subjects span { padding:4px 7px; border-radius:7px; background:#F1F5F9; color:#475569; font-size:.61rem; font-weight:600; }
+        .clearance-process-note { margin-top:1rem; padding:10px 12px; border:1px solid #FDE68A; border-radius:10px; background:#FFFBEB; color:#92400E; font-size:.67rem; line-height:1.55; }
+        .request-example-note { display:block; margin-top:6px; color:#64748B; font-size:.64rem; line-height:1.5; }
+        .study-plan-modal-box { max-width:1040px; width:min(1040px,100%); }
+        .study-plan-intro { margin:-.55rem 0 1rem; font-size:.72rem; color:var(--text-muted); }
+        .study-plan-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; margin-bottom:1.1rem; }
+        .study-plan-metric { padding:12px; border:1px solid var(--border-color); border-radius:12px; background:#F8FAFC; }
+        .study-plan-metric strong { display:block; color:#1E293B; font-size:1.1rem; }
+        .study-plan-metric span { font-size:.63rem; color:var(--text-muted); }
+        .study-plan-section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:.8rem 0; }
+        .study-plan-section-head h4 { color:#1E293B; font-size:.79rem; }
+        .study-plan-section-head p { color:var(--text-muted); font-size:.63rem; margin-top:2px; }
+        .study-plan-timetable { margin-bottom:1rem; }
+        .study-plan-timetable .schedule-body { min-width:700px; height:600px; }
+        .study-plan-timetable { overflow-x:auto; }
+        .study-plan-subjects { display:flex; flex-direction:column; gap:6px; max-height:230px; overflow:auto; }
+        .study-plan-subject-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 11px; border:1px solid #E2E8F0; border-radius:10px; background:#fff; font-size:.67rem; }
+        .study-plan-subject-row label { display:flex; align-items:flex-start; gap:8px; min-width:0; cursor:pointer; }
+        .study-plan-subject-row small { display:block; margin-top:2px; color:#64748B; font-size:.59rem; }
+        .study-plan-subject-row input { accent-color:#6366F1; margin-top:2px; }
+        .study-plan-subject-row.disabled { opacity:.55; background:#F8FAFC; }
+        .study-plan-disclaimer { margin:1rem 0; padding:10px 12px; border-radius:10px; background:#F8FAFC; color:#64748B; font-size:.64rem; line-height:1.55; }
+        .study-plan-actions { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+        @media (max-width:760px) {
+          .study-plan-summary { grid-template-columns:1fr; }
+          .study-plan-actions { align-items:stretch; flex-direction:column; }
+          .study-plan-actions > div { display:flex; justify-content:flex-end; gap:8px; }
+          .student-programs-grid { grid-template-columns:1fr; }
+        }
+        /* SCHEDULE PAGE */        /* SCHEDULE PAGE */
         .schedule-summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
         .sched-stat-card { background: white; border: 1px solid var(--border-color); padding: 1rem 1.25rem; border-radius: 14px; display: flex; align-items: center; gap: 14px; }
         .sched-stat-card .material-symbols-outlined { font-size: 26px; padding: 10px; border-radius: 12px; background: #EEF2FF; color: #6366F1; }
@@ -867,7 +1010,6 @@
             <div class="form-group">
               <label for="login-id">Email or Student ID</label>
               <input type="text" id="login-id" autocomplete="username" placeholder="Enter your email or Student ID" required>
-              <span class="auth-validation neutral">Your Student ID is shown after account creation and on your profile.</span>
             </div>
             <div class="form-group">
               <div class="auth-password-label-row"><label for="login-pass">Password</label><a class="forgot-pass" onclick="openModal('forgot-modal')">Forgot password?</a></div>
@@ -881,7 +1023,10 @@
           </div>
           <p class="auth-switch">Don't have an account? <a onclick="showSignup('student')">Create account</a></p>
         </div>
-        <div class="auth-logo-side"><svg class="enrolla-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg></div>
+        <div class="auth-logo-side">
+          <svg class="enrolla-logo" viewBox="0 0 340 100" role="img" aria-label="Enrolla"><use href="#enrolla-logo-g" /></svg>
+          <p class="auth-brand-tagline">Student Enrollment Management System</p>
+        </div>
       </div>
     </div>
     <!-- SIGN-UP VIEW -->
@@ -901,8 +1046,7 @@
               <div class="form-group"><label for="su-first">First Name</label><input type="text" id="su-first" required></div>
               <div class="form-group"><label for="su-last">Last Name</label><input type="text" id="su-last" required></div>
               <div class="form-group"><label for="su-mid">Middle Name (optional)</label><input type="text" id="su-mid"></div>
-              <div class="form-group"><label for="su-email">Email Address</label><input type="email" id="su-email" placeholder="name@naga.edu.ph" required><span class="auth-validation neutral" id="su-email-status" aria-live="polite">Enter a valid email address.</span></div>
-              <div class="signup-photo-picker"><img id="su-photo-preview" class="signup-photo-preview" alt="Profile preview"><div><label for="su-photo">Profile photo (optional)</label><input type="file" id="su-photo" accept="image/png,image/jpeg,image/webp"><small>JPG, PNG, or WebP up to 1 MB.</small><span class="auth-validation neutral" id="su-photo-status" aria-live="polite"></span></div></div>
+              <div class="form-group"><label for="su-email">Email Address</label><input type="email" id="su-email" placeholder="example@gmail.com" required><span class="auth-validation neutral" id="su-email-status" aria-live="polite">Enter a valid email address.</span></div>
             </div>
             <div class="auth-grid" id="su-student-fields">
               <div class="form-group"><label for="su-id">Student ID (leave blank to auto-generate)</label><input type="text" id="su-id" inputmode="numeric" placeholder="e.g. 20261234"><span class="auth-validation neutral" id="su-id-status" aria-live="polite">Optional; leave blank to generate one.</span></div>
@@ -918,7 +1062,7 @@
               <div class="form-group"><label for="su-code">Administrator Access Code</label><input type="password" id="su-code" placeholder="Provided by the school"></div>
             </div>
             <div class="auth-grid">
-              <div class="form-group"><label for="su-pass">Password (min. 8 characters)</label><input type="password" id="su-pass" class="has-password-status" autocomplete="new-password" minlength="8" required><span class="signup-password-status" id="su-pass-status" aria-hidden="true"></span><div class="password-rules" id="su-password-rules" aria-live="polite"><span data-rule="length">8+ characters</span><span data-rule="upper">Uppercase letter</span><span data-rule="lower">Lowercase letter</span><span data-rule="number">Number</span><span data-rule="special">Special character</span></div></div>
+              <div class="form-group"><label for="su-pass">Password (min. 8 characters)</label><input type="password" id="su-pass" class="has-password-status" autocomplete="new-password" minlength="8" placeholder="e.g. #3Dayezs" required><span class="signup-password-status" id="su-pass-status" aria-hidden="true"></span><div class="password-rules" id="su-password-rules" aria-live="polite"><span data-rule="length">8+ characters</span><span data-rule="upper">Uppercase letter</span><span data-rule="lower">Lowercase letter</span><span data-rule="number">Number</span><span data-rule="special">Special character</span></div></div>
               <div class="form-group"><label for="su-pass2">Confirm Password</label><input type="password" id="su-pass2" class="has-password-status" autocomplete="new-password" required><span class="signup-password-status" id="su-pass2-status" aria-hidden="true"></span></div>
             </div>
             <button type="submit" class="login-btn" id="su-submit-btn">Create Student Account</button>
@@ -946,6 +1090,7 @@
           <li class="active" data-target="dashboard"><a><span class="material-symbols-outlined">dashboard</span> Dashboard</a></li>
           <li data-target="profile"><a><span class="material-symbols-outlined">person</span> Profile</a></li>
           <li data-target="subjects"><a><span class="material-symbols-outlined">menu_book</span> Subjects <span class="nav-badge" id="nav-catalog-count">11</span></a></li>
+          <li data-target="programs"><a><span class="material-symbols-outlined">account_tree</span> Programs</a></li>
           <li data-target="enrollment"><a><span class="material-symbols-outlined">edit_document</span> Enrollment <span class="nav-badge" id="nav-units-badge">9u</span></a></li>
           <li data-target="schedule"><a><span class="material-symbols-outlined">calendar_month</span> Schedule</a></li>
           <li data-target="status"><a><span class="material-symbols-outlined">analytics</span> Status</a></li>
@@ -1006,7 +1151,7 @@
           <div class="dashboard-grid">
             <div class="dash-col">
               <div class="card">
-                <div class="card-header"><h3>Active Subjects</h3> <a onclick="navigateTo('schedule')">View Schedule &rarr;</a></div>
+                <div class="card-header"><h3>Active Subjects</h3> <a onclick="showMyProgramSubjects()">My Program Subjects &rarr;</a></div>
                 <ul class="dot-list" id="dash-dot-list">
                   <!-- Injected by JS -->
                 </ul>
@@ -1032,9 +1177,9 @@
               </div>
               <div class="card">
                 <div class="card-header"><h3>Enrollment Status</h3> <a onclick="navigateTo('status')">Clearances &rarr;</a></div>
-                <div class="enrolled-status-banner">
-                  <div class="status-icon"><span class="material-symbols-outlined">check</span></div>
-                  <div class="status-text"><h2>Enrolled</h2> <p>Officially registered for the current term.</p></div>
+                <div class="enrolled-status-banner" id="student-enrolled-status-banner" style="display:none;">
+                  <div class="status-icon"><span class="material-symbols-outlined" id="student-enrollment-status-icon">check</span></div>
+                  <div class="status-text"><h2 id="student-enrollment-status-title"></h2> <p id="student-enrollment-status-description"></p></div>
                 </div>
                 <div class="term-info"><span><span class="material-symbols-outlined">calendar_today</span> Academic Year</span> <span style="color:#1E293B; font-weight:600;">2026 - 2027</span></div>
                 <div class="term-info"><span><span class="material-symbols-outlined">label</span> Term</span> <span style="color:#1E293B; font-weight:600;">1st Semester (Fall)</span></div>
@@ -1044,7 +1189,7 @@
                 </div>
                 <div class="term-info">
                   <span><span class="material-symbols-outlined">verified_user</span> Clearance Hold</span>
-                  <span style="color:#065F46; font-weight:600;" id="dash-clearance-summary">None (Allowed to Enroll)</span>
+                  <span style="color:#92400E; font-weight:600;" id="dash-clearance-summary">Pending: Accounting, Library, Medical</span>
                 </div>
               </div>
             </div>
@@ -1059,7 +1204,7 @@
           <div class="alert-banner alert-success" id="student-enrollment-status-banner">
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="material-symbols-outlined" id="student-banner-icon">verified_user</span>
-              <div id="student-banner-text"><strong>Account Cleared for Enrollment:</strong> Finance & Library clearances are verified. Smart conflict & capacity detection is active.</div>
+              <div id="student-banner-text"><strong>Enrollment information:</strong> Accounting and Library clearances are Pending until the respective offices verify them. Subject-drop requests require Registrar approval.</div>
             </div>
             <span class="badge badge-enrolled" id="student-banner-badge">Enrollment Open</span>
           </div>
@@ -1076,7 +1221,10 @@
           <div class="enrollment-grid">
             <div class="enrollment-col">
               <div class="col-header">
-                <h3 style="font-weight: 600;">Available Courses (<span id="avail-count">0</span>)</h3>
+                <div>
+                  <h3 style="font-weight: 600;">Available Courses (<span id="avail-count">0</span>)</h3>
+                  <p style="font-size:.68rem; color:var(--text-muted); margin-top:3px;">Includes available subjects from all departments and academic programs.</p>
+                </div>
                 <div class="search-bar-wrap">
                   <span class="material-symbols-outlined">search</span>
                   <input type="text" id="enrollment-search" class="search-bar" placeholder="Search code, title, day..." oninput="updateAllViews()">
@@ -1103,18 +1251,40 @@
           <div class="catalog-controls">
             <div class="filter-pills" id="catalog-filter-pills">
               <button class="filter-pill active" onclick="setCatalogFilter('All')">All Subjects</button> <button class="filter-pill" onclick="setCatalogFilter('BSIT')">BSIT</button>
-              <button class="filter-pill" onclick="setCatalogFilter('BSCS')">BSCS</button> <button class="filter-pill" onclick="setCatalogFilter('BSBA')">BSBA</button>
+              <button class="filter-pill" onclick="setCatalogFilter('BSCS')">BSCS</button> <button class="filter-pill" onclick="setCatalogFilter('BSBA')">BSBA</button> <button class="filter-pill" onclick="setCatalogFilter('BSIS')">BSIS</button>
               <button class="filter-pill" onclick="setCatalogFilter('Core')">Core</button> <button class="filter-pill" onclick="setCatalogFilter('Major')">Major</button>
               <button class="filter-pill" onclick="setCatalogFilter('Gen Ed')">Gen Ed</button>
             </div>
-            <div class="search-bar-wrap">
-              <span class="material-symbols-outlined">search</span>
-              <input type="text" id="catalog-search" class="search-bar" placeholder="Filter catalog subjects..." oninput="renderCatalog()">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <select id="catalog-department-filter" class="search-bar" style="width:auto; min-width:190px; padding-left:14px;" onchange="renderCatalog()" aria-label="Filter subjects by department">
+                <option value="ALL">All Departments</option>
+              </select>
+              <div class="search-bar-wrap">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="catalog-search" class="search-bar" placeholder="Search all departments..." oninput="renderCatalog()">
+              </div>
             </div>
           </div>
+          <p id="catalog-scope-notice" style="font-size:.7rem; color:var(--text-muted); margin:-.9rem 0 1rem;">All available subjects are listed, including subjects offered by other departments and programs.</p>
           <div class="catalog-grid" id="catalog-list">
             <!-- Injected by JS -->
           </div>
+        </div>
+
+        <!-- --- STUDENT PROGRAM DIRECTORY --- -->
+        <div id="programs" class="page">
+          <div class="header">
+            <div>
+              <h1><span class="material-symbols-outlined" style="color:#6366F1; font-size:2.2rem; background:#EEF2FF; padding:10px; border-radius:14px;">account_tree</span> Academic Programs</h1>
+              <p style="color:var(--text-muted); font-size:.769rem; margin-top:4px;">Browse degree programs and their assigned curriculum subjects. Your own program is marked for quick access.</p>
+            </div>
+          </div>
+          <div class="catalog-controls">
+            <div style="font-size:.75rem; color:var(--text-muted);">Program directory</div>
+            <div class="search-bar-wrap"><span class="material-symbols-outlined">search</span><input id="student-program-search" type="search" class="search-bar" placeholder="Search program code, name, or department..." oninput="studentProgramPage=1; renderStudentPrograms()"></div>
+          </div>
+          <div id="student-programs-grid" class="student-programs-grid"></div>
+          <div class="pagination-bar" id="student-programs-pagination"></div>
         </div>
         <!-- --- SCHEDULE PAGE --- -->
         <div id="schedule" class="page">
@@ -1169,59 +1339,52 @@
           </div>
           <div class="status-grid">
             <div class="card gpa-card" id="status-gpa-card">
-              <div class="gpa-circle"><h2>3.85</h2> <span>CGPA (1.20 Eq.)</span></div>
-              <h3 style="margin-bottom: 4px; color:#1E293B;">Excellent Standing</h3>
-              <p style="font-size: 0.727rem; color: #6366F1; font-weight: 600; margin-bottom: 1rem;">Dean's Lister Candidate</p>
+              <div class="gpa-circle"><h2>—</h2> <span>CGPA</span></div>
+              <h3 style="margin-bottom: 4px; color:#1E293B;">Academic Standing</h3>
+              <p style="font-size: 0.727rem; color: #6366F1; font-weight: 600; margin-bottom: 1rem;">Regular Student</p>
               <div style="background:#F8FAFC; padding:12px; border-radius:12px; border:1px solid #F1F5F9; font-size:0.684rem; color:var(--text-muted);">
-                Completed Units:
-                <strong>42 Units</strong><br>
-                Academic Scholarship:
-                <strong>20% Tuition Grant</strong>
+                Completed Units: <strong>To be updated after grades are posted</strong><br>
+                Academic Scholarship: <strong>None recorded</strong>
               </div>
             </div>
             <div class="card">
-              <div class="card-header"><h3>Institutional Clearance Status</h3> <span class="badge badge-available" id="clearance-overall-badge">2 of 3 Cleared</span></div>
+              <div class="card-header"><h3>Institutional Clearance Status</h3> <span class="badge badge-available" id="clearance-overall-badge">0 of 3 Cleared</span></div>
               <div class="clearance-list">
                 <div class="clearance-item">
                   <div class="clearance-info">
                     <span class="material-symbols-outlined">account_balance</span>
                     <div>
                       <h4 style="margin:0; font-size:0.812rem;">Accounting / Finance Office</h4>
-                      <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Downpayment & tuition assessment verified for 1st Sem.</p>
+                      <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Payment details and tuition assessment are awaiting Accounting verification for this term.</p>
                     </div>
                   </div>
-                  <span class="status-badge status-cleared"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Cleared</span>
+                  <span class="status-badge status-pending" id="accounting-clearance-badge"><span class="material-symbols-outlined" style="font-size: 16px;">pending</span> Pending</span>
                 </div>
                 <div class="clearance-item">
                   <div class="clearance-info">
                     <span class="material-symbols-outlined">local_library</span>
                     <div>
                       <h4 style="margin:0; font-size:0.812rem;">University Library</h4>
-                      <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">No overdue books, lab equipment, or unreturned materials.</p>
+                      <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Borrowed books, laboratory equipment, and other materials are pending Library review.</p>
                     </div>
                   </div>
-                  <span class="status-badge status-cleared"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Cleared</span>
+                  <span class="status-badge status-pending" id="library-clearance-badge"><span class="material-symbols-outlined" style="font-size: 16px;">pending</span> Pending</span>
                 </div>
                 <div class="clearance-item" id="medical-clearance-row">
                   <!-- Dynamic rendered by JS -->
                 </div>
               </div>
+              <p class="clearance-process-note"><strong>Process confirmation:</strong> Accounting and Library requirements, submission steps, and approval timelines still need to be confirmed with the school secretary. Status remains Pending until the offices verify clearance.</p>
             </div>
           </div>
           <!-- Tuition & Assessment + Previous Grades -->
           <div class="dashboard-grid">
             <div class="card" id="status-grades-card">
-              <div class="card-header"><h3>Previous Semester Grades (1st Year, 2nd Sem)</h3> <span class="badge badge-enrolled">GPA: 3.88</span></div>
+              <div class="card-header"><h3>Previous Semester Grades</h3> <span class="badge badge-available">No GPA on file</span></div>
               <div class="grades-table-wrap">
                 <table class="grades-table">
                   <thead><tr><th>Code</th> <th>Subject Title</th> <th>Units</th> <th>Grade</th> <th>Remarks</th></tr></thead>
-                  <tbody>
-                    <tr><td><strong>CS 102</strong></td> <td>Computer Programming 1</td> <td>3</td> <td><strong>1.25 (96%)</strong></td> <td><span class="badge badge-enrolled">Passed</span></td></tr>
-                    <tr><td><strong>IT 104</strong></td> <td>Introduction to Computing</td> <td>3</td> <td><strong>1.00 (98%)</strong></td> <td><span class="badge badge-enrolled">Passed</span></td></tr>
-                    <tr><td><strong>MATH 101</strong></td> <td>Mathematics in the Modern World</td> <td>3</td> <td><strong>1.25 (95%)</strong></td> <td><span class="badge badge-enrolled">Passed</span></td></tr>
-                    <tr><td><strong>GE 102</strong></td> <td>Understanding the Self</td> <td>3</td> <td><strong>1.50 (92%)</strong></td> <td><span class="badge badge-enrolled">Passed</span></td></tr>
-                    <tr><td><strong>PE 102</strong></td> <td>Rhythmic Activities</td> <td>2</td> <td><strong>1.00 (99%)</strong></td> <td><span class="badge badge-enrolled">Passed</span></td></tr>
-                  </tbody>
+                  <tbody><tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">No previous semester grade records are available for this account yet. Grades and CGPA will appear here after they are officially posted.</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -1243,7 +1406,7 @@
                 <button class="change-photo-btn" onclick="openModal('avatar-modal')" title="Change Profile Photo"> <span class="material-symbols-outlined" style="font-size:20px;">photo_camera</span> </button>
               </div>
               <div class="student-id-badge" id="profile-id-badge">ID: &nbsp; 12345678</div>
-              <span class="badge badge-enrolled" style="padding: 6px 16px; font-size: 0.701rem;">Active Regular Student</span>
+              <span class="badge badge-enrolled" id="profile-enrollment-status-badge" style="display:none; padding: 6px 16px; font-size: 0.701rem;"></span>
             </div>
             <div class="profile-right">
               <h2>Personal Information <button class="edit-toggle-btn" id="edit-btn" onclick="toggleEditProfile()"> <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Edit Profile </button></h2>
@@ -1318,13 +1481,43 @@
                   <div class="modal-field full-width" id="req-subject-wrap"><label>Subject *</label><select id="req-subject"></select></div>
                   <div class="modal-field full-width" id="req-units-wrap"><label>Requested Total Units (25 to 30) *</label><input type="number" id="req-units" min="25" max="30" value="27"></div>
                   <div class="modal-field full-width">
-                    <label>Reason / Justification *</label><textarea id="req-reason" rows="5" maxlength="500" placeholder="Explain why you need this exception (at least 15 characters)." required></textarea>
+                    <label>Reason / Justification *</label><textarea id="req-reason" rows="5" maxlength="500" placeholder="Example: I am requesting [specific action] for [subject / term]. This is needed because [brief reason]. Supporting details: [documents or relevant context]." required></textarea><small class="request-example-note">Suggested format: Situation → Specific request → Reason → Supporting details. Keep the explanation clear and factual.</small>
                   </div>
                 </div>
                 <button type="submit" class="btn-primary-solid"><span class="material-symbols-outlined" style="font-size:18px;">send</span> Submit Request</button>
               </form>
             </div>
             <div class="card"><div class="card-header"><h3>My Requests</h3><span class="badge badge-available" id="req-count-badge">0</span></div> <div id="my-requests-list"></div></div>
+          </div>
+        </div>
+
+        <!-- STUDENT STUDY-PLAN PLANNER -->
+        <div class="modal-backdrop" id="study-plan-modal" onclick="if(event.target===this) closeModal('study-plan-modal')">
+          <div class="modal-box study-plan-modal-box" role="dialog" aria-modal="true" aria-labelledby="study-plan-title">
+            <div class="modal-header">
+              <h3 id="study-plan-title"><span class="material-symbols-outlined" style="color:#6366F1;">calendar_view_week</span> Suggested Study Plan</h3>
+              <button class="modal-close" type="button" onclick="closeModal('study-plan-modal')"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <p id="study-plan-program-label" class="study-plan-intro">Suggested subjects based on your academic program.</p>
+            <div class="study-plan-summary">
+              <div class="study-plan-metric"><strong id="study-plan-subject-count">0</strong><span>Suggested subjects</span></div>
+              <div class="study-plan-metric"><strong id="study-plan-new-units">0</strong><span>Additional units</span></div>
+              <div class="study-plan-metric"><strong id="study-plan-total-units">0 / 24</strong><span>Projected total load</span></div>
+            </div>
+            <div class="study-plan-section-head"><div><h4>Weekly schedule preview</h4><p>Includes your current approved subjects and the selected suggestions.</p></div><span class="badge badge-available" id="study-plan-mode-badge">Suggested plan</span></div>
+            <div class="schedule-container study-plan-timetable">
+              <div class="schedule-header"><div class="sched-day" style="border:none;">Time</div><div class="sched-day">Monday</div><div class="sched-day">Tuesday</div><div class="sched-day">Wednesday</div><div class="sched-day">Thursday</div><div class="sched-day">Friday</div></div>
+              <div class="schedule-body"><div class="time-col" id="study-plan-time-col"></div><div class="day-col" id="plan-col-Mon"></div><div class="day-col" id="plan-col-Tue"></div><div class="day-col" id="plan-col-Wed"></div><div class="day-col" id="plan-col-Thu"></div><div class="day-col" id="plan-col-Fri"></div></div>
+            </div>
+            <div id="study-plan-edit-area" style="display:none;">
+              <div class="study-plan-section-head"><div><h4>Choose individual subjects</h4><p>Selections update the timetable preview above. Full or conflicting subjects are disabled.</p></div></div>
+              <div id="study-plan-subject-choices" class="study-plan-subjects"></div>
+            </div>
+            <p class="study-plan-disclaimer">This is a planning aid based on the program's assigned subjects, listed class schedules, and available section capacity. Confirm prerequisite completion and final subject availability with your academic adviser or Registrar before relying on the plan.</p>
+            <div class="study-plan-actions">
+              <button type="button" class="btn-primary-outline" id="study-plan-edit-btn" onclick="enableStudyPlanEdit()">Edit &amp; Pick Individual Subjects</button>
+              <div><button type="button" class="btn-primary-outline" onclick="closeModal('study-plan-modal')">Close</button> <button type="button" class="btn-primary-solid" id="study-plan-accept-btn" onclick="submitStudyPlan(false)">Accept All</button></div>
+            </div>
           </div>
         </div>
       </main>
@@ -1445,7 +1638,7 @@
               <input type="text" id="stu-search" class="admin-input" style="flex:1; min-width:220px;" placeholder="Search by Student ID, Full Name, Email, or Program..." oninput="resetStuPageAndRender()">
               <select id="stu-filter-program" class="admin-select" onchange="resetStuPageAndRender()"><option value="ALL">All Programs</option></select>
               <select id="stu-filter-status" class="admin-select" onchange="resetStuPageAndRender()">
-                <option value="ALL">All Enrollment Statuses</option> <option value="Enrolled">Enrolled</option> <option value="Pending">Pending</option> <option value="Irregular">Irregular</option>
+                <option value="ALL">All Enrollment Statuses</option> <option value="__BLANK__">Blank / Not Set</option> <option value="Enrolled">Enrolled</option> <option value="Pending">Pending</option> <option value="Irregular">Irregular</option>
                 <option value="Not Enrolled">Not Enrolled</option>
               </select>
             </div>
@@ -1505,11 +1698,12 @@
               <button class="admin-btn admin-btn-navy" onclick="openProgramFormModal()"> <span class="material-symbols-outlined" style="font-size:18px;">add</span> Add Academic Program </button>
             </div>
             <div class="admin-toolbar">
-              <input type="text" id="prog-search" class="admin-input" style="flex:1;" placeholder="Search programs by Program Code (e.g. BSIT) or Program Name..." oninput="renderAdminPrograms()">
+              <input type="text" id="prog-search" class="admin-input" style="flex:1;" placeholder="Search programs by Program Code (e.g. BSIT) or Program Name..." oninput="resetProgPageAndRender()">
             </div>
             <div id="admin-programs-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); gap:1.25rem;">
               <!-- Populated dynamically by JS -->
             </div>
+            <div class="pagination-bar" id="prog-pagination-bar"></div>
           </div>
         </section>
         <!-- 5. MANAGE ENROLLMENT MODULE -->
@@ -1763,9 +1957,9 @@
               <input type="text" id="stu-form-password" placeholder="Min 6 characters" autocomplete="off">
             </div>
             <div class="modal-field full-width">
-              <label>Enrollment Status *</label>
-              <select id="stu-form-status" required>
-                <option value="Enrolled">Enrolled</option> <option value="Pending">Pending</option> <option value="Irregular">Irregular</option> <option value="Not Enrolled">Not Enrolled</option>
+              <label>Enrollment Status</label>
+              <select id="stu-form-status">
+                <option value="">Not set</option> <option value="Enrolled">Enrolled</option> <option value="Pending">Pending</option> <option value="Irregular">Irregular</option> <option value="Not Enrolled">Not Enrolled</option>
               </select>
             </div>
           </div>
@@ -1860,7 +2054,7 @@
         <form id="admin-new-enrollment-form" onsubmit="handleCreateEnrollment(event)">
           <div class="modal-form-grid">
             <div class="modal-field full-width"><label>Select Student *</label> <select id="enr-form-student" required></select></div>
-            <div class="modal-field full-width"><label>Select Subject (Available Capacity Checked) *</label> <select id="enr-form-subject" required></select></div>
+            <div class="modal-field full-width"><label>Select Subject (All Departments • Available Capacity Checked) *</label> <select id="enr-form-subject" required></select><small style="color:var(--gray-600);">The list includes all subjects across every academic program and department.</small></div>
             <div class="modal-field full-width">
               <label>Initial Enrollment Status *</label>
               <select id="enr-form-status" required><option value="Approved">Approved (Immediately reserve slot)</option> <option value="Pending">Pending (Await review)</option></select>
@@ -2002,7 +2196,6 @@
         let activeCatalogFilter = 'All';
         let currentSession = { role: null, userId: null, name: null };
         let signupType = 'student';
-        let signupAvatarData = '';
         let localAdminSignupCode = '';
         let lastEnrollmentKey = null;
         let memoryStorageFallback = {};
@@ -2068,6 +2261,13 @@
         const SUB_PER_PAGE = 7;
         let enrPage = 1;
         const ENR_PER_PAGE = 7;
+        let progPage = 1;
+        const PROG_PER_PAGE = 4;
+        let studentProgramPage = 1;
+        const STUDENT_PROGRAMS_PER_PAGE = 6;
+        let studentCatalogProgramScope = null;
+        let studyPlanSelection = [];
+        let studyPlanIsEditing = false;
 
         // Deterministic Password Hash (Pure JS synchronous hash - works in all contexts)
         function hashPassword(plain) {
@@ -2563,7 +2763,7 @@
             students = (profileRows || []).filter(p => p.role === 'student').map(p => ({
                 id: p.id, userId: p.id, studentId: p.student_id || p.id, fullName: p.full_name || 'Student',
                 email: p.email || '', contact: p.contact || 'Not provided', programCode: p.program || p.program_code || '',
-                yearLevel: p.year_level || '', enrollmentStatus: p.enrollment_status || 'Not Enrolled',
+                yearLevel: p.year_level || '', enrollmentStatus: p.enrollment_status && p.enrollment_status !== 'Not Enrolled' ? p.enrollment_status : '',
                 registeredOn: p.created_at, isDemo: !!p.is_demo
             }));
             admins = (profileRows || []).filter(p => p.role === 'admin' || p.role === 'super_admin').map(p => ({
@@ -2615,7 +2815,8 @@
                         studentStore['12345678'] = {
                             profile: parsed.profileData || { ...DEFAULT_PROFILE },
                             notifications: parsed.notifications || JSON.parse(JSON.stringify(DEFAULT_NOTIFICATIONS)),
-                            medicalCleared: !!parsed.medicalCleared
+                            medicalCleared: !!parsed.medicalCleared,
+                            clearances: { accountingCleared: false, libraryCleared: false }
                         };
                     }
                     specialRequests = parsed.specialRequests || JSON.parse(JSON.stringify(DEFAULT_REQUESTS));
@@ -2635,7 +2836,8 @@
             admins = JSON.parse(JSON.stringify(DEFAULT_ADMINS));
             auditLogs = JSON.parse(JSON.stringify(DEFAULT_AUDIT_LOGS));
             studentStore = {
-                '12345678': { profile: { ...DEFAULT_PROFILE }, notifications: JSON.parse(JSON.stringify(DEFAULT_NOTIFICATIONS)), medicalCleared: false }
+                '12345678': { profile: { ...DEFAULT_PROFILE }, notifications: JSON.parse(JSON.stringify(DEFAULT_NOTIFICATIONS)), medicalCleared: false,
+                    clearances: { accountingCleared: false, libraryCleared: false } }
             };
             specialRequests = JSON.parse(JSON.stringify(DEFAULT_REQUESTS));
             profileData = {};
@@ -2649,6 +2851,8 @@
                 const profile = students.find(s => s.studentId === currentSession.userId);
                 const authUser = (await supabaseClient.auth.getUser()).data.user;
                 if (authUser) {
+                    if (profile) refreshStudentEnrollmentStatus(currentSession.userId);
+                    await supabaseQuery(supabaseClient.from('profiles').update({ enrollment_status: profile?.enrollmentStatus || null }).eq('id', authUser.id), 'Saving student enrollment status');
                     const dateOfBirth = /^\d{4}-\d{2}-\d{2}$/.test(profileData.dob || '') ? profileData.dob : null;
                     await supabaseQuery(supabaseClient.from('student_profile_data').upsert({
                         profile_id: authUser.id, first_name: profileData.fname, middle_name: profileData.mname,
@@ -2674,7 +2878,29 @@
                 }
             }
             if (currentSession.role === 'admin' || currentSession.role === 'super_admin') {
+                const profileIdForStudent = studentId => {
+                    const student = students.find(s => s.studentId === studentId);
+                    return student?.userId || student?.id || null;
+                };
+                const backendEnrollmentRows = enrollments.map(e => ({
+                    id: e.id, student_id: profileIdForStudent(e.studentId),
+                    course_id: e.courseId || courses.find(c => c.code === e.subjectCode)?.id || null,
+                    program_code: e.programCode || students.find(s => s.studentId === e.studentId)?.programCode || null,
+                    status: e.status, date_submitted: e.dateSubmitted
+                })).filter(e => e.student_id && e.course_id);
+                const backendRequestRows = specialRequests.map(r => ({
+                    id: r.id, student_id: profileIdForStudent(r.studentId), type: r.type,
+                    course_id: courses.find(c => c.code === r.subjectCode)?.id || null,
+                    units: r.units, reason: r.reason, status: r.status, date_submitted: r.dateSubmitted,
+                    admin_remark: r.adminRemark, decided_by: r.decidedBy, decided_at: r.decidedAt
+                })).filter(r => r.student_id);
                 await Promise.all([
+                    supabaseQuery(supabaseClient.from('enrollments').upsert(backendEnrollmentRows, { onConflict: 'id' }), 'Saving admin enrollment decisions'),
+                    supabaseQuery(supabaseClient.from('special_requests').upsert(backendRequestRows, { onConflict: 'id' }), 'Saving admin special-request decisions'),
+                    ...students.filter(stu => stu.userId || stu.id).map(stu => supabaseQuery(
+                        supabaseClient.from('profiles').update({ enrollment_status: stu.enrollmentStatus || null }).eq('id', stu.userId || stu.id),
+                        `Saving enrollment status for ${stu.studentId}`
+                    )),
                     supabaseQuery(supabaseClient.from('courses').upsert(courses.map(c => ({
                         id: c.id, code: c.code, name: c.name, title: c.title, description: c.desc,
                         instructor: c.instructor, room: c.room, schedule_text: c.scheduleText, details: c.details,
@@ -2698,7 +2924,9 @@
         function saveState() {
             try {
                 if (currentSession.role === 'student' && currentSession.userId) {
-                    studentStore[currentSession.userId] = { profile: profileData, notifications, medicalCleared };
+                    const existingStudentData = ensureStudentStore(currentSession.userId);
+                    studentStore[currentSession.userId] = { ...existingStudentData, profile: profileData, notifications, medicalCleared,
+                        clearances: getStudentClearances(currentSession.userId) };
                 }
                 if (BACKEND_MODE) {
                     saveBackendState().catch(error => console.error('[Supabase] Save failed', error));
@@ -2708,6 +2936,48 @@
                     courses, programs, students, enrollments, enrollmentSettings, admins, auditLogs, studentStore, specialRequests
                 }));
             } catch (err) { console.warn('Could not save state:', err); }
+        }
+
+        // Keep the student's overall STATUS synchronized with enrollment records.
+        // A newly created account remains blank until it has an enrollment record.
+        function refreshStudentEnrollmentStatus(studentId) {
+            const student = students.find(s => s.studentId === studentId);
+            if (!student) return '';
+            const records = enrollments.filter(e => e.studentId === studentId);
+            if (records.some(e => e.status === 'Approved')) student.enrollmentStatus = 'Enrolled';
+            else if (records.some(e => e.status === 'Pending')) student.enrollmentStatus = 'Pending';
+            else if (student.enrollmentStatus === 'Enrolled' || student.enrollmentStatus === 'Pending') student.enrollmentStatus = '';
+            return student.enrollmentStatus || '';
+        }
+        function getPendingDropRequest(studentId, subjectCode) {
+            return specialRequests.find(r => r.studentId === studentId && r.type === 'Subject Drop Request' &&
+                String(r.subjectCode || '').toUpperCase() === String(subjectCode || '').toUpperCase() && r.status === 'Pending') || null;
+        }
+        function getCourseDepartmentLabel(course) {
+            const program = programs.find(p => p.code === course.programCode);
+            if (program?.department) return `${program.department} — ${course.programCode}`;
+            if (program?.name) return `${program.name} — ${course.programCode}`;
+            return course.programCode || 'Other Departments';
+        }
+        function renderStudentEnrollmentStatus() {
+            const student = students.find(s => s.studentId === currentSession.userId);
+            const status = student?.enrollmentStatus || '';
+            const banner = byId('student-enrolled-status-banner');
+            const title = byId('student-enrollment-status-title');
+            const description = byId('student-enrollment-status-description');
+            const icon = byId('student-enrollment-status-icon');
+            const profileBadge = byId('profile-enrollment-status-badge');
+            if (banner) {
+                banner.style.display = status ? 'flex' : 'none';
+                if (title) title.innerText = status;
+                if (description) description.innerText = status === 'Pending' ? 'Your enrollment record is awaiting Registrar review.' :
+                    (status === 'Enrolled' ? 'You have approved subjects in your current study load.' : 'Your current student status.');
+                if (icon) icon.innerText = status === 'Pending' ? 'hourglass_top' : 'check';
+            }
+            if (profileBadge) {
+                profileBadge.style.display = status ? 'inline-flex' : 'none';
+                profileBadge.innerText = status;
+            }
         }
 
         // Sync the logged-in student's view of `course.status` with the `enrollments` table
@@ -2780,7 +3050,8 @@
                         time: 'Just now', target: 'subjects', unread: true
                     }
                 ],
-                medicalCleared: false
+                medicalCleared: false,
+                clearances: { accountingCleared: false, libraryCleared: false }
             };
         }
         function ensureStudentStore(studentId) {
@@ -2795,6 +3066,13 @@
             profileData = st.profile;
             notifications = st.notifications;
             medicalCleared = !!st.medicalCleared;
+            if (!st.clearances) st.clearances = { accountingCleared: false, libraryCleared: false };
+            st.clearances = { accountingCleared: !!st.clearances.accountingCleared, libraryCleared: !!st.clearances.libraryCleared };
+        }
+        function getStudentClearances(studentId = currentSession.userId) {
+            const st = ensureStudentStore(studentId);
+            if (!st.clearances) st.clearances = { accountingCleared: false, libraryCleared: false };
+            return st.clearances;
         }
         function pushStudentNotification(studentId, icon, text, target) {
             const st = ensureStudentStore(studentId);
@@ -3002,10 +3280,6 @@
         function showSignup(type) {
             populateSignupPrograms();
             byId('signup-form').reset();
-            signupAvatarData = '';
-            const photoPreview = byId('su-photo-preview');
-            if (photoPreview) photoPreview.src = makeAvatar('New', 'Student');
-            setSignupStatus('su-photo-status', 'neutral', '');
             clearSignupError();
             setSignupType(type || 'student');
             updateSignupEmailStatus();
@@ -3139,34 +3413,6 @@
           });
           byId('su-pass')?.addEventListener('input', updateSignupPasswordStatus);
           byId('su-pass2')?.addEventListener('input', updateSignupConfirmPasswordStatus);
-          byId('su-photo')?.addEventListener('change', handleSignupPhoto);
-        }
-        function handleSignupPhoto(event) {
-          const file = event.target.files?.[0];
-          signupAvatarData = '';
-          if (!file) {
-            setSignupStatus('su-photo-status', 'neutral', '');
-            return;
-          }
-          if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-            event.target.value = '';
-            setSignupStatus('su-photo-status', 'invalid', 'Choose a JPG, PNG, or WebP image.');
-            return;
-          }
-          if (file.size > 1024 * 1024) {
-            event.target.value = '';
-            setSignupStatus('su-photo-status', 'invalid', 'Image must be 1 MB or smaller.');
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => {
-            signupAvatarData = String(reader.result || '');
-            const preview = byId('su-photo-preview');
-            if (preview) preview.src = signupAvatarData;
-            setSignupStatus('su-photo-status', 'valid', 'Profile photo ready.');
-          };
-          reader.onerror = () => setSignupStatus('su-photo-status', 'invalid', 'Could not read that image.');
-          reader.readAsDataURL(file);
         }
         function signupError(msg) {
             const el = byId('signup-error');
@@ -3238,7 +3484,7 @@
                 try {
                     const { data, error } = await supabaseClient.auth.signUp({
                         email, password: pass,
-                        options: { data: { student_id: signupType === 'admin' ? null : studentId, username: signupType === 'admin' ? val('su-username') : null, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact, avatar_url: signupAvatarData || '', admin_signup_code: signupType === 'admin' ? val('su-code') : null } }
+                        options: { data: { student_id: signupType === 'admin' ? null : studentId, username: signupType === 'admin' ? val('su-username') : null, full_name: fullName, program: val('su-program'), year_level: val('su-year'), contact, avatar_url: '', admin_signup_code: signupType === 'admin' ? val('su-code') : null, enrollment_status: null } }
                     });
                     if (error) {
                         const message = formatSignupAuthError(error.message);
@@ -3300,13 +3546,13 @@
             }
             const localContact = contact || 'Not provided';
             students.unshift({
-                studentId, fullName, email, contact: localContact, programCode: val('su-program'), yearLevel: val('su-year'), enrollmentStatus: 'Not Enrolled',
-                passwordHash: hashPassword(pass), registeredOn: nowStamp(), avatar: signupAvatarData || makeAvatar(first, last)
+                studentId, fullName, email, contact: localContact, programCode: val('su-program'), yearLevel: val('su-year'), enrollmentStatus: '',
+                passwordHash: hashPassword(pass), registeredOn: nowStamp(), avatar: makeAvatar(first, last)
             });
             studentStore[studentId] = {
                 profile: {
                     fname: first, mname: mid, lname: last, email, phone: localContact, dob: 'Not provided', campus: 'Naga Campus, Central Visayas',
-                    address: 'Not provided', guardian: 'Not provided', avatar: signupAvatarData || makeAvatar(first, last)
+                    address: 'Not provided', guardian: 'Not provided', avatar: makeAvatar(first, last)
                 },
                 notifications: [
                     {
@@ -3318,7 +3564,8 @@
                         unread: true
                     }
                 ],
-                medicalCleared: false
+                medicalCleared: false,
+                clearances: { accountingCleared: false, libraryCleared: false }
             };
             logAuthEvent(studentId, 'Student', 'Students', 'REGISTER_STUDENT', `Student ${studentId} (${fullName}) registered a new account.`);
             saveState();
@@ -3369,6 +3616,7 @@
                     username: metadata.username || null,
                     program_code: metadata.program || null,
                     year_level: metadata.year_level || null,
+                    enrollment_status: null,
                     role: 'student'
                 }, { onConflict: 'id' }).select('*').single();
                 if (profileInsert.error) throw profileInsert.error;
@@ -3408,7 +3656,7 @@
                     contact: profile.contact || '',
                     programCode: profile.program_code || '',
                     yearLevel: profile.year_level || '',
-                    enrollmentStatus: profile.enrollment_status || 'Not Enrolled',
+                    enrollmentStatus: profile.enrollment_status && profile.enrollment_status !== 'Not Enrolled' ? profile.enrollment_status : '',
                     isDemo: !!profile.is_demo
                 }];
                 admins = [];
@@ -3602,15 +3850,20 @@
             showToast(`Password reset instructions sent to ${val}`, 'success');
         }
         const QUICK_ACTION_OPTIONS = [
-            { id: 'subjects', label: 'Browse Subjects', description: 'Go directly to the subject catalog', icon: 'menu_book', target: 'subjects' },
-            { id: 'schedule', label: 'View Other Schedules', description: 'Compare available class schedules', icon: 'calendar_month', target: 'schedule' }
+            { id: 'my-program-subjects', label: 'My Program Subjects', description: 'See subjects assigned to your academic program', icon: 'school', target: 'subjects' },
+            { id: 'study-plan', label: 'Build My Study Plan', description: 'Plot a conflict-checked schedule and enroll in selected subjects', icon: 'event_available', target: null },
+            { id: 'subjects', label: 'Browse All Subjects', description: 'Explore subjects across all departments', icon: 'menu_book', target: 'subjects' },
+            { id: 'programs', label: 'Browse Programs', description: 'View programs and their assigned subjects', icon: 'account_tree', target: 'programs' },
+            { id: 'schedule', label: 'View My Schedule', description: 'See your currently approved class schedule', icon: 'calendar_month', target: 'schedule' }
         ];
         function getQuickActionsKey() {
             return `enrolla_quick_actions_${currentSession.userId || 'guest'}`;
         }
         function getQuickActions() {
             try {
-                const stored = JSON.parse(safeGetItem(getQuickActionsKey()) || '[]');
+                const raw = safeGetItem(getQuickActionsKey());
+                if (raw === null) return ['my-program-subjects', 'study-plan'];
+                const stored = JSON.parse(raw || '[]');
                 return Array.isArray(stored) ? stored.filter(id => QUICK_ACTION_OPTIONS.some(option => option.id === id)) : [];
             } catch (error) {
                 return [];
@@ -3659,6 +3912,8 @@
             if (!option) return;
             byId('quick-actions-picker')?.classList.remove('open');
             document.querySelector('.quick-action-add')?.setAttribute('aria-expanded', 'false');
+            if (actionId === 'my-program-subjects') { showMyProgramSubjects(); return; }
+            if (actionId === 'study-plan') { openStudyPlanPlanner(); return; }
             navigateTo(option.target);
         }
         window.toggleQuickActionPicker = toggleQuickActionPicker;
@@ -3698,10 +3953,14 @@
         // GLOBAL STATE UPDATER
         function updateAllViews() {
             syncStudentCoursesWithEnrollments();
-            const enrolledCourses = courses.filter(c => c.status === 'enrolled');
+            if (currentSession.role === 'student' && currentSession.userId) refreshStudentEnrollmentStatus(currentSession.userId);
+            const enrolledCourses = currentSession.role === 'student'
+                ? getStudentEnrolledCourses(currentSession.userId)
+                : courses.filter(c => c.status === 'enrolled');
             const availableCourses = courses.filter(c => c.status === 'available');
             const currentUnits = enrolledCourses.reduce((sum, c) => sum + c.units, 0);
             const totalWeeklyHours = enrolledCourses.reduce((sum, c) => sum + (c.duration * c.days.length), 0);
+            renderStudentEnrollmentStatus();
             const effectiveStatus = getEffectiveEnrollmentStatus();
             const grants = getStudentGrants(currentSession.role === 'student' ? currentSession.userId : null);
             const maxUnits = grants.maxUnits;
@@ -3720,7 +3979,7 @@
                 if (effectiveStatus === 'Open') {
                     bannerEl.className = 'alert-banner alert-success';
                     bannerIcon.innerText = 'verified_user';
-                    bannerText.innerHTML = `<strong>Enrollment is Open (${enrollmentSettings.academicYear} • ${enrollmentSettings.semester}):</strong> You may enroll in subjects within capacity limits. Subject drops require Registrar approval.`;
+                    bannerText.innerHTML = `<strong>Enrollment is Open (${enrollmentSettings.academicYear} • ${enrollmentSettings.semester}):</strong> Subject enrollment is available within capacity limits. Accounting and Library clearances remain Pending until verified by their offices. Subject drops require Registrar approval.`;
                     bannerBadge.className = 'badge badge-enrolled';
                     bannerBadge.innerText = 'Open';
                 } else if (effectiveStatus === 'Scheduled') {
@@ -3763,7 +4022,7 @@
             enrolledContainer.innerHTML = '';
             const filteredAvailable = availableCourses.filter(c => c.title.toLowerCase().includes(searchQuery) ||
                 c.details.toLowerCase().includes(searchQuery) || c.type.toLowerCase().includes(searchQuery) || (c.programCode ||
-                '').toLowerCase().includes(searchQuery) || c.room.toLowerCase().includes(searchQuery));
+                '').toLowerCase().includes(searchQuery) || getCourseDepartmentLabel(c).toLowerCase().includes(searchQuery) || c.room.toLowerCase().includes(searchQuery));
             byId('avail-count').innerText = filteredAvailable.length;
             byId('enrolled-count').innerText = enrolledCourses.length;
             if (filteredAvailable.length === 0) {
@@ -3781,7 +4040,7 @@
                 availContainer.innerHTML += ` <div class="course-card ${(conflictCourse || isFull) ? 'conflict-card' :
                     ''}"> <div class="course-info">
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;"> <h4 style="margin:0;" onclick="openCourseModal('${course.id}')">${course.title}</h4>
-                    <span class="badge ${badgeClass}">${course.programCode || 'BSIT'} • ${course.type}</span> <span class="badge ${isFull ?
+                    <span class="badge ${badgeClass}">${course.programCode || 'BSIT'} • ${course.type}</span> <span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(course))}</span> <span class="badge ${isFull ?
                     'badge-core' : 'badge-enrolled'}">${isFull ? 'FULL (0 Slots)' : (isFullRaw ? 'Override Approved' :
                     `${slotsLeft} Slots Left`)}</span> ${conflictCourse ?
                     `<span class="badge badge-conflict"><span class="material-symbols-outlined" style="font-size:13px;">warning</span> Conflicts w/ ${conflictCode}</span>` :
@@ -3795,13 +4054,14 @@
             }
             enrolledCourses.forEach(course => {
                 const badgeClass = getTypeBadgeClass(course.type);
+                const pendingDrop = getPendingDropRequest(currentSession.userId, course.code);
                 enrolledContainer.innerHTML += ` <div class="course-card"> <div class="course-info">
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;"> <h4 style="margin:0;" onclick="openCourseModal('${course.id}')">${course.title}</h4>
-                    <span class="badge ${badgeClass}">${course.programCode ||
-                    'BSIT'} • ${course.type}</span> </div> <p>
-                    <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> ${course.details} • <strong>${course.room}</strong> </p> </div>
-                    <button class="btn-action btn-drop" onclick="startDropRequest('${course.id}')" ${!isEnrollmentOpen ? 'style="opacity:0.5;"' :
-                    ''}> Request Drop </button> </div>`;
+                    <span class="badge ${badgeClass}">${course.programCode || 'BSIT'} • ${course.type}</span>
+                    <span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(course))}</span>
+                    ${pendingDrop ? '<span class="badge badge-elective">Drop request pending</span>' : ''}</div> <p>
+                    <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> ${course.details} • <strong>${course.room}</strong>${pendingDrop ? ' • This subject stays in your study load until the Registrar approves the request.' : ''} </p> </div>
+                    <button class="btn-action btn-drop" onclick="startDropRequest('${course.id}')" ${pendingDrop || !isEnrollmentOpen ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>${pendingDrop ? 'Awaiting Admin' : 'Request Drop'}</button> </div>`;
             });
             const fillPercentage = Math.min(100, (currentUnits / maxUnits) * 100);
             byId('unit-progress').style.width = `${fillPercentage}%`;
@@ -3824,8 +4084,9 @@
                 const dotClass = index % 2 === 0 ? 'dot-blue' : 'dot-teal';
                 dashDotList.innerHTML += `<li class="${dotClass}" onclick="openCourseModal('${c.id}')" style="cursor:pointer;">${c.title}</li>`;
                 let icon = c.type === 'Core' ? 'terminal' : (c.type === 'Major' ? 'hub' : 'menu_book');
+                const pendingDrop = getPendingDropRequest(currentSession.userId, c.code);
                 dashSubList.innerHTML += ` <div class="subject-item" onclick="openCourseModal('${c.id}')"> <div class="subject-info"> <span class="material-symbols-outlined subject-icon">${icon}</span>
-                    <div> <h4>${c.title}</h4> <p>${c.units} Units • ${c.scheduleText} • ${c.room}</p> </div> </div> <span class="badge badge-enrolled">Enrolled</span> </div>`;
+                    <div> <h4>${c.title}</h4> <p>${c.units} Units • ${c.scheduleText} • ${c.room}${pendingDrop ? ' • Drop request awaiting Registrar approval' : ''}</p> </div> </div> <span class="badge ${pendingDrop ? 'badge-elective' : 'badge-enrolled'}">${pendingDrop ? 'Drop Pending' : 'Enrolled'}</span> </div>`;
             });
             // 3. Update Schedule Page & Summary
             byId('sched-stat-courses').innerText = `${enrolledCourses.length} Subjects`;
@@ -3834,6 +4095,7 @@
             renderSchedule(enrolledCourses);
             // 4. Render Subject Catalog
             renderCatalog();
+            renderStudentPrograms();
             // 5. Render Status & Tuition Page
             renderStatusAndTuition(currentUnits);
             // 6. Render Notifications
@@ -3856,7 +4118,7 @@
                     'error');
                 return;
             }
-            const currentUnits = courses.filter(c => c.status === 'enrolled').reduce((sum, c) => sum + c.units, 0);
+            const currentUnits = getStudentEnrolledCourses(sid).reduce((sum, c) => sum + c.units, 0);
             if (course.status === 'available') {
                 const isFull = course.enrolledCount >= course.maxCapacity;
                 if (isFull && !grants.full.includes(course.code)) {
@@ -3904,7 +4166,147 @@
             updateAllViews();
         };
 
-        // SCHEDULE RENDERER
+
+        // Program-based study plan planner. This previews a safe, conflict-free set; final eligibility is still reviewed by the Registrar.
+        function getStudyPlanCandidates() {
+            const student = students.find(s => s.studentId === currentSession.userId);
+            if (!student?.programCode) return [];
+            const enrolled = getStudentEnrolledCourses(currentSession.userId);
+            const enrolledCodes = new Set(enrolled.map(c => c.code.toUpperCase()));
+            const priority = { Core: 0, Major: 1, 'Gen Ed': 2, Minor: 3, Elective: 4 };
+            return getProgramCateredCourses(student.programCode)
+                .filter(course => !enrolledCodes.has(course.code.toUpperCase()) && course.status !== 'enrolled')
+                .sort((a,b) => (priority[a.type] ?? 5) - (priority[b.type] ?? 5) || a.code.localeCompare(b.code));
+        }
+        function planCourseBlockReason(course, selected) {
+            const grants = getStudentGrants(currentSession.userId);
+            if (course.enrolledCount >= course.maxCapacity && !grants.full.includes(course.code)) return 'Section is full';
+            const enrolled = getStudentEnrolledCourses(currentSession.userId);
+            const conflict = [...enrolled, ...selected.filter(item => item.id !== course.id)]
+                .find(existing => schedulesOverlap(course, existing));
+            if (conflict && !grants.conflict.includes(course.code)) return `Overlaps with ${conflict.code}`;
+            const units = enrolled.reduce((sum,c) => sum+c.units,0) + selected.filter(item => item.id !== course.id).reduce((sum,c) => sum+c.units,0);
+            if (units + course.units > grants.maxUnits) return `Would exceed ${grants.maxUnits}-unit limit`;
+            return '';
+        }
+        function buildSuggestedStudyPlan() {
+            const candidates = getStudyPlanCandidates();
+            const selected = [];
+            for (const course of candidates) {
+                if (!planCourseBlockReason(course, selected)) selected.push(course);
+            }
+            return selected;
+        }
+        function openStudyPlanPlanner() {
+            if (currentSession.role !== 'student') return;
+            const student = students.find(s => s.studentId === currentSession.userId);
+            if (!student?.programCode) { showToast('Your academic program is not on file. Please contact the Registrar.', 'warning'); return; }
+            const program = programs.find(p => p.code === student.programCode);
+            studyPlanSelection = buildSuggestedStudyPlan().map(c => c.id);
+            studyPlanIsEditing = false;
+            byId('study-plan-edit-area').style.display = 'none';
+            byId('study-plan-edit-btn').style.display = '';
+            byId('study-plan-accept-btn').innerText = 'Accept All';
+            byId('study-plan-mode-badge').innerText = 'Suggested plan';
+            byId('study-plan-program-label').innerText = `${student.programCode} • ${program?.name || ''}. These suggestions are drawn from the subjects assigned to your program and are plotted around your currently approved classes.`;
+            renderStudyPlanPlanner();
+            openModal('study-plan-modal');
+        }
+        function renderStudyPlanPlanner() {
+            const candidates = getStudyPlanCandidates();
+            const selected = candidates.filter(c => studyPlanSelection.includes(c.id));
+            const enrolled = getStudentEnrolledCourses(currentSession.userId);
+            const projected = [...enrolled, ...selected];
+            const units = selected.reduce((sum,c) => sum+c.units,0);
+            const totalUnits = enrolled.reduce((sum,c) => sum+c.units,0) + units;
+            const grants = getStudentGrants(currentSession.userId);
+            byId('study-plan-subject-count').innerText = selected.length;
+            byId('study-plan-new-units').innerText = units;
+            byId('study-plan-total-units').innerText = `${totalUnits} / ${grants.maxUnits}`;
+            byId('study-plan-accept-btn').disabled = !selected.length || getEffectiveEnrollmentStatus() !== 'Open' && !grants.late;
+            byId('study-plan-accept-btn').style.opacity = byId('study-plan-accept-btn').disabled ? '.5' : '1';
+            byId('study-plan-mode-badge').innerText = studyPlanIsEditing ? 'Custom selection' : 'Suggested plan';
+            renderStudyPlanSchedule(projected);
+            if (studyPlanIsEditing) renderStudyPlanChoices(candidates, selected);
+        }
+        function renderStudyPlanSchedule(plannedCourses) {
+            const timeCol = byId('study-plan-time-col');
+            if (timeCol && !timeCol.childElementCount) {
+                timeCol.innerHTML = Array.from({length:10},(_,i)=>{ const hour=i+8; const label=hour%12 || 12; return `<div class="time-slot">${label}:00 ${hour<12?'AM':'PM'}</div>`; }).join('');
+            }
+            const days = ['Mon','Tue','Wed','Thu','Fri'];
+            days.forEach(day => {
+                const col = byId(`plan-col-${day}`);
+                if (!col) return;
+                col.innerHTML = '';
+                plannedCourses.filter(course => (course.days || []).includes(day)).forEach(course => {
+                    const topPx = (course.startHour - 8) * 60;
+                    const heightPx = course.duration * 60;
+                    const code = course.code || course.title.split('-')[0].trim();
+                    const name = course.name || course.title.split('-').slice(1).join('-').trim();
+                    const isCurrent = getStudentEnrolledCourses(currentSession.userId).some(c => c.id === course.id);
+                    col.innerHTML += `<div class="class-block cb-${course.color || 'blue'}" style="top:${topPx+2}px;height:${Math.max(34,heightPx-4)}px;" title="${escapeHtml(course.title)}"><h4>${escapeHtml(code)}</h4><span style="font-weight:500;line-height:1.15;">${escapeHtml(name)}</span><span class="cb-room">${escapeHtml(course.room || 'TBA')} • ${isCurrent ? 'Enrolled' : 'Proposed'}</span></div>`;
+                });
+            });
+        }
+        function renderStudyPlanChoices(candidates, selected) {
+            const area = byId('study-plan-subject-choices');
+            if (!area) return;
+            area.innerHTML = candidates.map(course => {
+                const checked = selected.some(item => item.id === course.id);
+                const withoutCurrent = selected.filter(item => item.id !== course.id);
+                const reason = checked ? '' : planCourseBlockReason(course, withoutCurrent);
+                const disabled = !!reason;
+                return `<div class="study-plan-subject-row ${disabled ? 'disabled' : ''}">
+                    <label><input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="toggleStudyPlanCourse('${course.id}',this.checked)">
+                      <span><strong>${escapeHtml(course.code)} — ${escapeHtml(course.name || course.title)}</strong><small>${course.units} units • ${escapeHtml(course.scheduleText || 'Schedule TBA')} • ${escapeHtml(course.programCode || '')}</small></span>
+                    </label><span style="font-size:.6rem;color:${disabled ? '#B45309' : '#64748B'};">${checked ? 'Selected' : (reason || 'Available')}</span>
+                  </div>`;
+            }).join('') || '<div class="req-empty">No additional curriculum subjects are available for planning.</div>';
+        }
+        function toggleStudyPlanCourse(courseId, checked) {
+            const course = courses.find(c => c.id === courseId);
+            if (!course) return;
+            if (checked) {
+                const selected = studyPlanSelection.map(id => courses.find(c => c.id === id)).filter(Boolean);
+                const reason = planCourseBlockReason(course, selected);
+                if (reason) { showToast(`${course.code} cannot be added: ${reason}.`, 'warning'); return; }
+                if (!studyPlanSelection.includes(courseId)) studyPlanSelection.push(courseId);
+            } else {
+                studyPlanSelection = studyPlanSelection.filter(id => id !== courseId);
+            }
+            renderStudyPlanPlanner();
+        }
+        function enableStudyPlanEdit() {
+            studyPlanIsEditing = true;
+            byId('study-plan-edit-area').style.display = '';
+            byId('study-plan-edit-btn').style.display = 'none';
+            byId('study-plan-accept-btn').innerText = 'Enroll Selected Subjects';
+            renderStudyPlanPlanner();
+        }
+        function submitStudyPlan() {
+            const selectedIds = [...studyPlanSelection];
+            if (!selectedIds.length) { showToast('Select at least one subject to continue.', 'warning'); return; }
+            const grants = getStudentGrants(currentSession.userId);
+            if (getEffectiveEnrollmentStatus() !== 'Open' && !grants.late) { showToast('Enrollment is currently closed. You cannot submit this study plan yet.', 'error'); return; }
+            const selectedCourses = selectedIds.map(id => courses.find(c => c.id === id)).filter(c => c && c.status !== 'enrolled');
+            let enrolledCount = 0;
+            selectedCourses.forEach(course => {
+                const before = enrollments.filter(e => e.studentId === currentSession.userId && e.subjectCode.toUpperCase() === course.code.toUpperCase() && e.status === 'Approved').length;
+                // toggleCourse refreshes the student's active load after each successful subject, so later checks see earlier selections.
+                window.toggleCourse(course.id);
+                const after = enrollments.filter(e => e.studentId === currentSession.userId && e.subjectCode.toUpperCase() === course.code.toUpperCase() && e.status === 'Approved').length;
+                if (after > before || course.status === 'enrolled') enrolledCount += 1;
+            });
+            closeModal('study-plan-modal');
+            showToast(enrolledCount ? `${enrolledCount} subject(s) added to your study load.` : 'No subjects were added. Review capacity, unit, schedule, and enrollment restrictions.', enrolledCount ? 'success' : 'info');
+        }
+        window.openStudyPlanPlanner = openStudyPlanPlanner;
+        window.enableStudyPlanEdit = enableStudyPlanEdit;
+        window.toggleStudyPlanCourse = toggleStudyPlanCourse;
+        window.submitStudyPlan = submitStudyPlan;
+
+        // SCHEDULE RENDERER        // SCHEDULE RENDERER
         function renderSchedule(enrolledCourses) {
             const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
             days.forEach(day => {
@@ -3924,8 +4326,73 @@
             });
         }
 
-        // CATALOG FILTER & RENDERER
+
+        function getProgramCateredCourses(programCode) {
+            const program = programs.find(p => p.code === programCode);
+            if (!program) return [];
+            const assigned = Array.isArray(program.subjectCodes) ? program.subjectCodes : [];
+            if (assigned.length) {
+                const codeSet = new Set(assigned.map(code => String(code).toUpperCase()));
+                return courses.filter(course => codeSet.has(String(course.code).toUpperCase()));
+            }
+            return courses.filter(course => course.programCode === programCode);
+        }
+        function showProgramSubjects(programCode) {
+            const program = programs.find(p => p.code === programCode);
+            if (!program) return;
+            studentCatalogProgramScope = programCode;
+            activeCatalogFilter = 'All';
+            const search = byId('catalog-search');
+            if (search) search.value = '';
+            const department = byId('catalog-department-filter');
+            if (department) department.value = 'ALL';
+            document.querySelectorAll('#catalog-filter-pills .filter-pill').forEach(btn => btn.classList.toggle('active', btn.innerText.includes('All')));
+            navigateTo('subjects');
+            renderCatalog();
+        }
+        function showMyProgramSubjects() {
+            const student = students.find(s => s.studentId === currentSession.userId);
+            if (!student?.programCode) { showToast('Your academic program is not on file yet. Please contact the Registrar.', 'warning'); return; }
+            showProgramSubjects(student.programCode);
+        }
+        function renderStudentPrograms() {
+            const container = byId('student-programs-grid');
+            if (!container) return;
+            const query = (byId('student-program-search')?.value || '').trim().toLowerCase();
+            const student = students.find(s => s.studentId === currentSession.userId);
+            const ownCode = student?.programCode || '';
+            const filtered = programs.filter(program => `${program.code} ${program.name} ${program.department} ${program.description}`.toLowerCase().includes(query));
+            const totalPages = Math.max(1, Math.ceil(filtered.length / STUDENT_PROGRAMS_PER_PAGE));
+            studentProgramPage = Math.min(Math.max(1, studentProgramPage), totalPages);
+            const pageItems = filtered.slice((studentProgramPage - 1) * STUDENT_PROGRAMS_PER_PAGE, studentProgramPage * STUDENT_PROGRAMS_PER_PAGE);
+            if (!pageItems.length) {
+                container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;color:var(--text-muted);">No academic programs match your search.</div>';
+            } else {
+                container.innerHTML = pageItems.map(program => {
+                    const subjectList = getProgramCateredCourses(program.code);
+                    const own = program.code === ownCode;
+                    const chips = subjectList.slice(0, 8).map(course => `<span>${escapeHtml(course.code)}</span>`).join('');
+                    const more = subjectList.length > 8 ? `<span>+${subjectList.length - 8} more</span>` : '';
+                    return `<article class="student-program-card ${own ? 'is-own' : ''}">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                          <div><span class="badge badge-available">${escapeHtml(program.code)}</span><h3 style="margin-top:7px;">${escapeHtml(program.name)}</h3></div>
+                          ${own ? '<span class="badge badge-enrolled">Your program</span>' : ''}
+                        </div>
+                        <p><strong>Department:</strong> ${escapeHtml(program.department || 'Not specified')}</p>
+                        <p>${escapeHtml(program.description || 'No program description available.')}</p>
+                        <div><p style="font-weight:600;margin-bottom:5px;">Assigned subjects (${subjectList.length})</p><div class="student-program-subjects">${chips || '<span>No assigned subjects listed</span>'}${more}</div></div>
+                        <div style="margin-top:auto;display:flex;justify-content:flex-end;"><button type="button" class="btn-primary-outline" onclick="showProgramSubjects('${escapeHtml(program.code)}')">View program subjects</button></div>
+                      </article>`;
+                }).join('');
+            }
+            renderPaginationBar('student-programs-pagination', filtered.length, studentProgramPage, totalPages, 'setStudentProgramPage');
+        }
+        function setStudentProgramPage(page) { studentProgramPage = page; renderStudentPrograms(); }
+        window.setStudentProgramPage = setStudentProgramPage;
+
+        // CATALOG FILTER & RENDERER        // CATALOG FILTER & RENDERER
         function setCatalogFilter(category) {
+            studentCatalogProgramScope = null;
             activeCatalogFilter = category;
             document.querySelectorAll('#catalog-filter-pills .filter-pill').forEach(btn => {
                 if (btn.innerText.includes(category) || (category === 'All' && btn.innerText.includes('All'))) {
@@ -3986,12 +4453,31 @@
         function renderCatalog() {
             const catalog = byId('catalog-list');
             const query = (byId('catalog-search')?.value || '').toLowerCase().trim();
+            const departmentSelect = byId('catalog-department-filter');
+            if (departmentSelect) {
+                const previousDepartment = departmentSelect.value || 'ALL';
+                const departments = [...new Set(courses.map(getCourseDepartmentLabel))].sort((a, b) => a.localeCompare(b));
+                departmentSelect.innerHTML = '<option value="ALL">All Departments</option>' + departments.map(dept =>
+                    `<option value="${escapeHtml(dept)}">${escapeHtml(dept)}</option>`).join('');
+                departmentSelect.value = departments.includes(previousDepartment) ? previousDepartment : 'ALL';
+            }
+            const selectedDepartment = departmentSelect?.value || 'ALL';
+            const scopeNotice = byId('catalog-scope-notice');
+            if (scopeNotice) {
+                const scopedProgram = studentCatalogProgramScope ? programs.find(p => p.code === studentCatalogProgramScope) : null;
+                scopeNotice.innerText = scopedProgram
+                    ? `Showing subjects assigned to ${scopedProgram.code} — ${scopedProgram.department || scopedProgram.name}. Use a category or department filter to broaden your search.`
+                    : 'All available subjects are listed, including subjects offered by other departments and programs.';
+            }
             catalog.innerHTML = '';
             const filtered = courses.filter(c => {
+                const departmentLabel = getCourseDepartmentLabel(c);
                 const matchesCat = activeCatalogFilter === 'All' || c.type === activeCatalogFilter || c.programCode === activeCatalogFilter;
-                const matchesQuery = c.title.toLowerCase().includes(query) || c.desc.toLowerCase().includes(query) || (c.programCode ||
-                    '').toLowerCase().includes(query) || c.instructor.toLowerCase().includes(query);
-                return matchesCat && matchesQuery;
+                const matchesDepartment = selectedDepartment === 'ALL' || departmentLabel === selectedDepartment;
+                const matchesProgramScope = !studentCatalogProgramScope || getProgramCateredCourses(studentCatalogProgramScope).some(assigned => assigned.code === c.code);
+                const haystack = `${c.title} ${c.desc} ${c.programCode || ''} ${c.instructor || ''} ${departmentLabel}`.toLowerCase();
+                const matchesQuery = !query || haystack.includes(query);
+                return matchesCat && matchesDepartment && matchesProgramScope && matchesQuery;
             });
             if (filtered.length === 0) {
                 catalog.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:2.5rem;">No courses match your current filter.</div>`;
@@ -3999,14 +4485,16 @@
             }
             filtered.forEach(c => {
                 const isEnrolled = c.status === 'enrolled';
+                const pendingDrop = isEnrolled && getPendingDropRequest(currentSession.userId, c.code);
                 const isFull = c.enrolledCount >= c.maxCapacity;
                 const badgeClass = getTypeBadgeClass(c.type);
                 catalog.innerHTML += ` <div class="catalog-card" onclick="openCourseModal('${c.id}')">
                     <div class="cat-subject">
                         <div class="cat-header"><div class="cat-title"><h3>${c.title}</h3></div></div>
                         <div class="cat-meta-badges"><span class="badge ${badgeClass}">${c.programCode || 'BSIT'} • ${c.type}</span>
-                        <span class="badge ${isEnrolled ? 'badge-enrolled' : (isFull ? 'badge-core' : 'badge-available')}">${isEnrolled ? 'Enrolled' :
-                    (isFull ? 'Full (' + c.enrolledCount + '/' + c.maxCapacity + ')' : 'Available (' + c.enrolledCount + '/' + c.maxCapacity + ')')}</span></div>
+                        <span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(c))}</span>
+                        <span class="badge ${isEnrolled ? 'badge-enrolled' : (isFull ? 'badge-core' : 'badge-available')}">${pendingDrop ? 'Drop Pending' : (isEnrolled ? 'Enrolled' :
+                    (isFull ? 'Full (' + c.enrolledCount + '/' + c.maxCapacity + ')' : 'Available (' + c.enrolledCount + '/' + c.maxCapacity + ')'))}</span></div>
                     </div>
                     <span class="cat-units">${c.units} Units</span>
                     <div class="cat-schedule-box"><span class="material-symbols-outlined" style="font-size:16px; color:#6366F1;">schedule</span>
@@ -4020,7 +4508,7 @@
                     <span class="material-symbols-outlined" style="font-size:15px; vertical-align:middle;">person</span> ${c.instructor}</span>
                     <div style="display:flex; gap:6px;">
                     <button class="cat-action btn-action" style="background:#F1F5F9; color:#334155; padding:6px 10px; font-size:0.64rem;" onclick="event.stopPropagation(); openCourseModal('${c.id}')">Details</button>
-                    <button class="cat-action btn-action ${isEnrolled ? 'btn-drop' : 'btn-enroll'}" onclick="event.stopPropagation(); ${isEnrolled ? `startDropRequest('${c.id}')` : `toggleCourse('${c.id}')`}" style="padding:6px 10px; font-size:0.64rem;">${isEnrolled ? 'Request Drop' : (isFull ? 'Full' : 'Enroll')}</button>
+                    <button class="cat-action btn-action ${isEnrolled ? 'btn-drop' : 'btn-enroll'}" ${pendingDrop ? 'disabled' : ''} onclick="event.stopPropagation(); ${isEnrolled ? `startDropRequest('${c.id}')` : `toggleCourse('${c.id}')`}" style="padding:6px 10px; font-size:0.64rem;${pendingDrop ? ' opacity:.5; cursor:not-allowed;' : ''}">${pendingDrop ? 'Awaiting Admin' : (isEnrolled ? 'Request Drop' : (isFull ? 'Full' : 'Enroll'))}</button>
                     </div></div></div> `;
             });
         }
@@ -4030,18 +4518,33 @@
             const medRow = byId('medical-clearance-row');
             const overallBadge = byId('clearance-overall-badge');
             const dashSummary = byId('dash-clearance-summary');
+            const clearances = getStudentClearances();
+            const accountingBadge = byId('accounting-clearance-badge');
+            const libraryBadge = byId('library-clearance-badge');
+            const officeRows = [
+                { badge: accountingBadge, cleared: clearances.accountingCleared },
+                { badge: libraryBadge, cleared: clearances.libraryCleared }
+            ];
+            officeRows.forEach(({badge, cleared}) => {
+                if (!badge) return;
+                badge.className = `status-badge ${cleared ? 'status-cleared' : 'status-pending'}`;
+                badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">${cleared ? 'check_circle' : 'pending'}</span> ${cleared ? 'Cleared' : 'Pending'}`;
+            });
+            const clearedCount = officeRows.filter(item => item.cleared).length + (medicalCleared ? 1 : 0);
+            overallBadge.className = clearedCount === 3 ? 'badge badge-enrolled' : 'badge badge-available';
+            overallBadge.innerText = `${clearedCount} of 3 Cleared`;
+            const pendingNames = [];
+            if (!clearances.accountingCleared) pendingNames.push('Accounting');
+            if (!clearances.libraryCleared) pendingNames.push('Library');
+            if (!medicalCleared) pendingNames.push('Medical');
+            dashSummary.innerText = pendingNames.length ? `Pending: ${pendingNames.join(', ')}` : 'All Offices Cleared (3/3)';
+            dashSummary.style.color = pendingNames.length ? '#92400E' : '#065F46';
             if (medicalCleared) {
-                overallBadge.className = 'badge badge-enrolled';
-                overallBadge.innerText = '3 of 3 Cleared';
-                dashSummary.innerText = 'All Offices Cleared (3/3)';
                 medRow.innerHTML = ` <div class="clearance-info"> <span class="material-symbols-outlined">medical_services</span> <div>
                     <h4 style="margin:0; font-size:0.812rem;">University Medical Clinic</h4>
-                    <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Annual physical exam & chest X-ray verified.</p> </div> </div>
+                    <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Medical record submitted and marked cleared.</p> </div> </div>
                     <span class="status-badge status-cleared"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Cleared</span> `;
             } else {
-                overallBadge.className = 'badge badge-available';
-                overallBadge.innerText = '2 of 3 Cleared';
-                dashSummary.innerText = 'None (Medical Record Optional)';
                 medRow.innerHTML = ` <div class="clearance-info"> <span class="material-symbols-outlined">medical_services</span> <div>
                     <h4 style="margin:0; font-size:0.812rem;">University Medical Clinic</h4>
                     <p style="margin:0; font-size: 0.684rem; color: var(--text-muted);">Annual physical exam record pending submission.</p> </div> </div>
@@ -4050,22 +4553,23 @@
                     <span class="material-symbols-outlined" style="font-size:15px;">upload_file</span> Submit Record </button>
                     <span class="status-badge status-pending"><span class="material-symbols-outlined" style="font-size: 16px;">pending</span> Pending</span> </div> `;
             }
-            // Tuition Calculation
+            // No payment or scholarship is assumed. Accounting must record these values before the balance changes.
             const tuitionPerUnit = 850;
             const tuitionFee = currentUnits * tuitionPerUnit;
             const miscFee = currentUnits > 0 ? 4250 : 0;
-            const labFee = courses.filter(c => c.status === 'enrolled' && c.room.includes('Lab')).length * 1200;
+            const labFee = getStudentEnrolledCourses().filter(c => (c.room || '').includes('Lab')).length * 1200;
             const grossTotal = tuitionFee + miscFee + labFee;
-            const scholarshipDiscount = Math.round(tuitionFee * 0.20); // 20% Dean's Lister
-            const downpaymentPaid = currentUnits > 0 ? 5000 : 0;
+            const scholarshipDiscount = 0;
+            const downpaymentPaid = 0;
             const netBalance = Math.max(0, grossTotal - scholarshipDiscount - downpaymentPaid);
             byId('tuition-summary-box').innerHTML = ` <div class="term-info"><span>Tuition Fee (${currentUnits} units × ₱850)</span><strong style="color:#1E293B;">₱${tuitionFee.toLocaleString()}</strong></div>
                 <div class="term-info"><span>Miscellaneous & Registration Fees</span><strong style="color:#1E293B;">₱${miscFee.toLocaleString()}</strong></div>
                 <div class="term-info"><span>Computer / Cisco Laboratory Fees</span><strong style="color:#1E293B;">₱${labFee.toLocaleString()}</strong></div>
-                <div class="term-info" style="background:#EEF2FF; color:#4F46E5;"><span>Dean's Lister Scholarship (20% Tuition)</span><strong>- ₱${scholarshipDiscount.toLocaleString()}</strong></div>
-                <div class="term-info" style="background:#D1FAE5; color:#065F46;"><span>Enrollment Downpayment Paid</span><strong>- ₱${downpaymentPaid.toLocaleString()}</strong></div>
-                <div class="term-info" style="background:#1E293B; color:white; font-size:0.855rem; padding:14px;"> <span>Remaining Term Balance</span> <strong style="color:#A7F3FA;">₱${netBalance.toLocaleString()}.00</strong>
-                </div> `;
+                <div class="term-info" style="background:#F8FAFC; color:#64748B;"><span>Scholarship / Grant (if approved)</span><strong>₱${scholarshipDiscount.toLocaleString()}</strong></div>
+                <div class="term-info" style="background:#FFFBEB; color:#92400E;"><span>Enrollment Downpayment (recorded)</span><strong>- ₱${downpaymentPaid.toLocaleString()}</strong></div>
+                <div class="term-info" style="background:#1E293B; color:white; font-size:0.855rem; padding:14px;"> <span>Estimated Remaining Balance</span> <strong style="color:#A7F3FA;">₱${netBalance.toLocaleString()}.00</strong>
+                </div>
+                <p style="font-size:.62rem;color:#64748B;margin-top:8px;">Estimate only. Accounting must confirm actual assessments, payments, and approved discounts.</p> `;
         }
         function submitMedicalClearance() {
             medicalCleared = true;
@@ -4079,13 +4583,15 @@
             const c = courses.find(item => item.id === courseId);
             if (!c) return;
             const isEnrolled = c.status === 'enrolled';
+            const pendingDrop = isEnrolled && getPendingDropRequest(currentSession.userId, c.code);
             const badgeClass = getTypeBadgeClass(c.type);
             byId('modal-course-title').innerHTML = ` <span class="material-symbols-outlined" style="color:#6366F1;">menu_book</span> ${c.title} `;
             const topicsHtml = (c.topics || []).map(t => `<li style="margin-bottom:6px;">${t}</li>`).join('');
             byId('modal-course-body').innerHTML = ` <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem;"> <span class="badge ${badgeClass}">${c.type} Subject</span>
                 <span class="badge badge-available">${c.units} Academic Units</span> <span class="badge ${isEnrolled ? 'badge-enrolled' :
                 'badge-elective'}">${isEnrolled ? 'Currently Enrolled' :
-                'Not Enrolled'}</span> </div>
+                'Not Enrolled'}</span> <span class="badge badge-available">${escapeHtml(getCourseDepartmentLabel(c))}</span>
+                ${pendingDrop ? '<span class="badge badge-elective">Drop request pending review</span>' : ''}</div>
                 <p style="color:#334155; font-size:0.787rem; line-height:1.6; margin-bottom:1.25rem;">${c.desc}</p>
                 <div style="background:#F8FAFC; padding:1rem 1.25rem; border-radius:14px; border:1px solid var(--border-color); margin-bottom:1.25rem; display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.735rem;">
                 <div><strong>Instructor:</strong> ${c.instructor}</div> <div><strong>Room Assignment:</strong> ${c.room}</div> <div><strong>Schedule:</strong> ${c.scheduleText}</div>
@@ -4094,15 +4600,17 @@
                 <ul style="padding-left:1.25rem; font-size:0.735rem; color:#475569; margin-bottom:1.5rem;"> ${topicsHtml} </ul>
                 <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border-color); padding-top:1rem;">
                 <button class="btn-primary-outline" onclick="closeModal('course-modal')">Close</button> <button class="btn-action ${isEnrolled ?
-                'btn-drop' : 'btn-enroll'}" onclick="toggleCourse('${c.id}'); closeModal('course-modal');"> ${isEnrolled ? 'Drop Subject' :
-                'Enroll in Subject'} </button> </div> `;
+                'btn-drop' : 'btn-enroll'}" ${pendingDrop ? 'disabled' : ''} onclick="toggleCourse('${c.id}'); closeModal('course-modal');"> ${pendingDrop ? 'Awaiting Admin Review' : (isEnrolled ? 'Request Drop' :
+                'Enroll in Subject')} </button> </div> `;
             openModal('course-modal');
         }
 
         // CERTIFICATE OF REGISTRATION (COR) MODAL
         function openCORModal() {
-            const enrolled = courses.filter(c => c.status === 'enrolled');
+            syncStudentCoursesWithEnrollments();
+            const enrolled = getStudentEnrolledCourses(currentSession.userId);
             const totalUnits = enrolled.reduce((s, c) => s + c.units, 0);
+            const pendingDropCodes = specialRequests.filter(r => r.studentId === currentSession.userId && r.type === 'Subject Drop Request' && r.status === 'Pending').map(r => r.subjectCode);
             const fullName = `${profileData.lname.toUpperCase()}, ${profileData.fname.toUpperCase()} ${profileData.mname.toUpperCase()}`;
             const rowsHtml = enrolled.map(c => ` <tr> <td><strong>${c.title.split('-')[0].trim()}</strong></td> <td>${c.title.split('-')[1].trim()}</td> <td>${c.type}</td>
                 <td style="text-align:center;"><strong>${c.units}</strong></td> <td>${c.scheduleText}</td> <td>${c.room}</td> <td>${c.instructor}</td> </tr> `).join('');
@@ -4119,7 +4627,8 @@
                 <th>Schedule</th> <th>Room</th> <th>Instructor</th> </tr> </thead> <tbody> ${rowsHtml ||
                 '<tr><td colspan="7" style="text-align:center;">No subjects enrolled</td></tr>'} </tbody> <tfoot> <tr style="background:#EEF2FF; font-weight:700;">
                 <td colspan="3" style="text-align:right;">Total Enrolled Load:</td> <td style="text-align:center; color:#4F46E5;">${totalUnits} Units</td>
-                <td colspan="3">Status: Officially Enrolled</td> </tr> </tfoot> </table> </div>
+                <td colspan="3">Status: ${students.find(x => x.studentId === currentSession.userId)?.enrollmentStatus || ''}</td> </tr> </tfoot> </table> </div>
+                ${pendingDropCodes.length ? `<p style="font-size:.7rem; color:#92400E; background:#FEF3C7; border:1px solid #FDE68A; padding:9px 12px; border-radius:9px; margin-top:10px;">Pending drop request(s): ${pendingDropCodes.map(escapeHtml).join(', ')}. These subjects remain included in your official study load until the Registrar approves the request.</p>` : ''}
                 <div style="display:flex; justify-content:space-between; font-size:0.667rem; color:var(--text-muted); margin-top:1.25rem; padding-top:1rem; border-top:1px dashed #CBD5E1;">
                 <div>Generated via Enrolla Student Portal • Verification Code: <strong>ENR-2026-${currentSession.userId}</strong></div>
                 <div>Registrar Signature: <em>Digitally Signed</em></div> </div> </div> `;
@@ -4156,6 +4665,7 @@
             const sid = currentSession.userId || '';
             const stu = students.find(x => x.studentId === sid);
             byId('profile-id-badge').innerHTML = `ID: &nbsp; ${escapeHtml(sid)}`;
+            renderStudentEnrollmentStatus();
             if (stu) {
                 const prog = programs.find(p => p.code === stu.programCode);
                 byId('sidebar-year').innerText = `${stu.yearLevel} • ${stu.programCode}`;
@@ -4440,7 +4950,7 @@
                 const matchQ = s.studentId.toLowerCase().includes(q) || s.fullName.toLowerCase().includes(q) || s.email.toLowerCase().includes(q) ||
                     s.programCode.toLowerCase().includes(q);
                 const matchProg = progFilter === 'ALL' || s.programCode === progFilter;
-                const matchStat = statusFilter === 'ALL' || s.enrollmentStatus === statusFilter;
+                const matchStat = statusFilter === 'ALL' || (statusFilter === '__BLANK__' ? !s.enrollmentStatus : s.enrollmentStatus === statusFilter);
                 return matchQ && matchProg && matchStat;
             });
             filtered.sort((a, b) => {
@@ -4461,7 +4971,7 @@
                         'pill-cancelled');
                     return ` <tr> <td><strong>${s.studentId}</strong></td> <td><strong>${s.fullName}</strong></td> <td> <div>${s.email}</div>
                         <div style="font-size:0.641rem; color:var(--gray-600);">${s.contact}</div> </td> <td><span class="badge badge-available">${s.programCode}</span></td> <td>${s.yearLevel}</td>
-                        <td><span class="status-pill ${pillCls}">${s.enrollmentStatus}</span></td> <td style="text-align:right; white-space:nowrap;">
+                        <td>${s.enrollmentStatus ? `<span class="status-pill ${pillCls}">${escapeHtml(s.enrollmentStatus)}</span>` : ''}</td> <td style="text-align:right; white-space:nowrap;">
                         <button class="admin-btn admin-btn-sm admin-btn-outline" onclick="viewStudentRecord('${s.studentId}')" title="View Details">
                         <span class="material-symbols-outlined" style="font-size:16px;">visibility</span> </button>
                         <button class="admin-btn admin-btn-sm admin-btn-outline" onclick="openStudentFormModal('${s.studentId}')" title="Edit Student">
@@ -4549,6 +5059,7 @@
                 logAdminAction('Students', 'CREATE_STUDENT', `Added new student ${studentId} (${fullName}) to ${programCode}.`);
                 showToast(`Added new student ${fullName} (${studentId}).`, 'success');
             }
+            refreshStudentEnrollmentStatus(studentId);
             saveState();
             closeModal('student-form-modal');
             renderAllAdminViews();
@@ -4769,38 +5280,43 @@
             const q = (byId('prog-search')?.value || '').toLowerCase().trim();
             const container = byId('admin-programs-grid');
             const filtered = programs.filter(p => p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) ||
-                p.description.toLowerCase().includes(q));
+                p.description.toLowerCase().includes(q) || (p.department || '').toLowerCase().includes(q));
+            const totalPages = Math.max(1, Math.ceil(filtered.length / PROG_PER_PAGE));
+            progPage = Math.min(Math.max(1, progPage), totalPages);
+            const pageItems = filtered.slice((progPage - 1) * PROG_PER_PAGE, progPage * PROG_PER_PAGE);
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="admin-panel" style="grid-column:1/-1; text-align:center;">No academic programs match your search.</div>`;
-                return;
-            }
-            container.innerHTML = filtered.map(p => {
-                const activeStuCount = students.filter(s => s.programCode === p.code).length;
-                const activeEnrCount = enrollments.filter(e => e.programCode === p.code && (e.status === 'Approved' ||
-                    e.status === 'Pending')).length;
-                const assignedBadges = p.subjectCodes.map(sc => {
-                    const sub = courses.find(c => c.code === sc);
-                    return `<span class="badge badge-available" style="margin:2px;" title="${sub ? sub.name : sc}">${sc}</span>`;
+            } else {
+                container.innerHTML = pageItems.map(p => {
+                    const activeStuCount = students.filter(s => s.programCode === p.code).length;
+                    const activeEnrCount = enrollments.filter(e => e.programCode === p.code && (e.status === 'Approved' || e.status === 'Pending')).length;
+                    const assignedCodes = Array.isArray(p.subjectCodes) ? p.subjectCodes : [];
+                    const assignedBadges = assignedCodes.map(sc => {
+                        const sub = courses.find(c => c.code === sc);
+                        return `<span class="badge badge-available" style="margin:2px;" title="${sub ? escapeHtml(sub.name) : escapeHtml(sc)}">${escapeHtml(sc)}</span>`;
+                    }).join('');
+                    return ` <div class="admin-program-card"> <div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;"> <div>
+                      <span class="badge program-code" style="font-size:0.701rem; margin-bottom:4px;">${escapeHtml(p.code)}</span>
+                      <h3 class="program-title" style="font-size:0.898rem;">${escapeHtml(p.name)}</h3> </div> <span class="status-pill pill-open">${assignedCodes.length} Subjects</span> </div>
+                      <p class="program-description" style="font-size:0.71rem; margin-bottom:12px;">${escapeHtml(p.description || '')}</p>
+                      <div class="program-curriculum" style="padding:10px 12px; border-radius:10px; margin-bottom:12px;">
+                      <div class="program-curriculum-label" style="font-size:0.641rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;"> Assigned Curriculum Subjects (${assignedCodes.length}): </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:4px;"> ${assignedBadges || '<span style="font-size:0.684rem; color:var(--text-muted);">No subjects assigned yet.</span>'} </div> </div> </div>
+                      <div class="program-footer" style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F1F5F9; padding-top:12px; flex-wrap:wrap; gap:8px;">
+                      <span style="font-size:0.667rem; color:var(--text-muted);"> <strong>${activeStuCount}</strong> Students • <strong>${activeEnrCount}</strong> Active Enrollments </span>
+                        <div style="display:flex; gap:6px;"> <button class="admin-btn admin-btn-sm program-action-assign" onclick="openProgramSubjectsModal('${escapeHtml(p.code)}')">
+                        <span class="material-symbols-outlined" style="font-size:15px;">rule</span> Assign Subjects </button>
+                        <button class="admin-btn admin-btn-sm program-action-edit" onclick="openProgramFormModal('${escapeHtml(p.code)}')"><span class="material-symbols-outlined" style="font-size:15px;">edit</span></button>
+                        <button class="admin-btn admin-btn-sm program-action-delete" onclick="attemptDeleteProgram('${escapeHtml(p.code)}')"><span class="material-symbols-outlined" style="font-size:15px;">delete</span></button> </div> </div> </div> `;
                 }).join('');
-                return ` <div class="admin-program-card"> <div>
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;"> <div>
-                  <span class="badge program-code" style="font-size:0.701rem; margin-bottom:4px;">${p.code}</span>
-                  <h3 class="program-title" style="font-size:0.898rem;">${p.name}</h3> </div> <span class="status-pill pill-open">${p.subjectCodes.length} Subjects</span> </div>
-                  <p class="program-description" style="font-size:0.71rem; margin-bottom:12px;">${p.description}</p>
-                  <div class="program-curriculum" style="padding:10px 12px; border-radius:10px; margin-bottom:12px;">
-                  <div class="program-curriculum-label" style="font-size:0.641rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;"> Assigned Curriculum Subjects (${p.subjectCodes.length}): </div>
-                    <div style="display:flex; flex-wrap:wrap; gap:4px;"> ${assignedBadges ||
-                    '<span style="font-size:0.684rem; color:var(--text-muted);">No subjects assigned yet.</span>'} </div> </div> </div>
-                  <div class="program-footer" style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F1F5F9; padding-top:12px; flex-wrap:wrap; gap:8px;">
-                  <span style="font-size:0.667rem; color:var(--text-muted);"> <strong>${activeStuCount}</strong> Students • <strong>${activeEnrCount}</strong> Active Enrollments </span>
-                    <div style="display:flex; gap:6px;"> <button class="admin-btn admin-btn-sm program-action-assign" onclick="openProgramSubjectsModal('${p.code}')">
-                    <span class="material-symbols-outlined" style="font-size:15px;">Rule</span> Assign Subjects </button>
-                    <button class="admin-btn admin-btn-sm program-action-edit" onclick="openProgramFormModal('${p.code}')">
-                    <span class="material-symbols-outlined" style="font-size:15px;">edit</span> </button>
-                    <button class="admin-btn admin-btn-sm program-action-delete" onclick="attemptDeleteProgram('${p.code}')">
-                    <span class="material-symbols-outlined" style="font-size:15px;">delete</span> </button> </div> </div> </div> `;
-            }).join('');
+            }
+            renderPaginationBar('prog-pagination-bar', filtered.length, progPage, totalPages, 'setProgPage');
         }
+        function resetProgPageAndRender() { progPage = 1; renderAdminPrograms(); }
+        function setProgPage(page) { progPage = page; renderAdminPrograms(); }
+        window.setProgPage = setProgPage;
+        window.resetProgPageAndRender = resetProgPageAndRender;
         function openProgramFormModal(programCode = null) {
             if (programCode) {
                 const p = programs.find(item => item.code === programCode);
@@ -4860,7 +5376,7 @@
             const rows = courses.map(c => {
                 const isAssigned = p.subjectCodes.includes(c.code);
                 return ` <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--gray-200);"> <div> <strong>${c.code} - ${c.name}</strong>
-                    <div style="font-size:0.65rem; color:var(--gray-600);">${c.units} Units • Primary Program: ${c.programCode}</div> </div> <button class="admin-btn admin-btn-sm ${isAssigned ?
+                    <div style="font-size:0.65rem; color:var(--gray-600);">${c.units} Units • Primary Program: ${c.programCode} • Department: ${escapeHtml(getCourseDepartmentLabel(c))}</div> </div> <button class="admin-btn admin-btn-sm ${isAssigned ?
                     'admin-btn-danger' : 'admin-btn-success'}" onclick="toggleAssignSubjectToProgram('${p.code}', '${c.code}')"> ${isAssigned ?
                     'Remove from ' + p.code : '+ Assign to ' + p.code} </button> </div> `;
             }).join('');
@@ -4981,13 +5497,7 @@
             }
             enr.status = newStatus;
             enr.dateSubmitted = new Date().toISOString().replace('T', ' ').substring(0, 16);
-            // Update student's overall enrollmentStatus if they have at least 1 Approved subject
-            const stu = students.find(s => s.studentId === enr.studentId);
-            if (stu) {
-                const hasApproved = enrollments.some(e => e.studentId === stu.studentId && e.status === 'Approved');
-                const hasPending = enrollments.some(e => e.studentId === stu.studentId && e.status === 'Pending');
-                stu.enrollmentStatus = hasApproved ? 'Enrolled' : (hasPending ? 'Pending' : 'Not Enrolled');
-            }
+            refreshStudentEnrollmentStatus(enr.studentId);
             logAdminAction('Enrollment', `STATUS_${newStatus.toUpperCase()}`,
                 `Updated enrollment ${enr.id} (${enr.studentId} -> ${enr.subjectCode}) from ${oldStatus} to ${newStatus}.`);
             saveState();
@@ -5001,7 +5511,7 @@
             const subSel = byId('enr-form-subject');
             subSel.innerHTML = courses.map(c => {
                 const isFull = c.enrolledCount >= c.maxCapacity;
-                return `<option value="${c.code}" ${isFull ? 'disabled' : ''}>${c.code} - ${c.name} (${c.enrolledCount}/${c.maxCapacity} ${isFull ?
+                return `<option value="${escapeHtml(c.code)}" ${isFull ? 'disabled' : ''}>${escapeHtml(c.code)} - ${escapeHtml(c.name)} • ${escapeHtml(getCourseDepartmentLabel(c))} (${c.enrolledCount}/${c.maxCapacity} ${isFull ?
                     'FULL' : 'Available'})</option>`;
             }).join('');
             openModal('new-enrollment-modal');
@@ -5026,12 +5536,13 @@
                 showToast(`Capacity Reached: ${subjectCode} is already full (${sub.enrolledCount}/${sub.maxCapacity}).`, 'error');
                 return;
             }
-            if (status === 'Approved') { sub.enrolledCount += 1; stu.enrollmentStatus = 'Enrolled'; }
+            if (status === 'Approved') sub.enrolledCount += 1;
             const newId = 'ENR-' + Math.floor(1012 + Math.random() * 8900);
             enrollments.unshift({
                 id: newId, studentId, subjectCode, programCode: stu.programCode, status,
                 dateSubmitted: new Date().toISOString().replace('T', ' ').substring(0, 16)
             });
+            refreshStudentEnrollmentStatus(studentId);
             logAdminAction('Enrollment', 'CREATE_ENROLLMENT', `Created ${status} enrollment ${newId} for ${studentId} in ${subjectCode}.`);
             saveState();
             closeModal('new-enrollment-modal');
@@ -5349,12 +5860,18 @@
             if (currentSession.role !== 'student') return;
             const course = courses.find(c => c.id === courseId);
             if (!course || course.status !== 'enrolled') return;
+            const existingRequest = getPendingDropRequest(currentSession.userId, course.code);
+            if (existingRequest) {
+                navigateTo('requests');
+                showToast(`A drop request for ${course.code} is already awaiting Registrar approval. The subject remains in your study load.`, 'info');
+                return;
+            }
             navigateTo('requests');
             byId('req-type').value = 'Subject Drop Request';
             onRequestTypeChange();
             byId('req-subject').value = course.code;
             byId('req-reason').focus();
-            showToast(`Drop request started for ${course.code}. Add your reason and submit it for Registrar approval.`, 'info');
+            showToast(`Drop request started for ${course.code}. Add your reason and submit it for Registrar approval. Your study load will not change while it is pending.`, 'info');
         }
         window.startDropRequest = startDropRequest;
         function renderStudentRequests() {
@@ -5445,6 +5962,7 @@
             addNotification('contact_support', `${type} ${req.id} was submitted for Registrar approval.`, 'requests');
             byId('req-reason').value = '';
             saveState();
+            updateAllViews();
             renderStudentRequests();
             showToast(`Request ${req.id} submitted. The Registrar will review it.`, 'success');
         }
@@ -5455,6 +5973,7 @@
             r.status = 'Cancelled';
             logAdminAction('Requests', 'CANCEL_REQUEST', `Student ${r.studentId} cancelled ${r.id}.`);
             saveState();
+            updateAllViews();
             renderStudentRequests();
             showToast(`Request ${r.id} cancelled.`, 'info');
         }
@@ -5541,6 +6060,7 @@
                 r.expiresAt = new Date(Date.now() + days * 86400000).toISOString();
             }
             r.status = approved ? 'Approved' : 'Rejected';
+            if (r.type === 'Subject Drop Request') refreshStudentEnrollmentStatus(r.studentId);
             const nice = approved ? 'approved' : 'rejected';
             pushStudentNotification(r.studentId, approved ? 'check_circle' : 'cancel',
                 `Your special request ${r.id} (${r.type}) was ${nice}.${remark ? ' Remarks: ' + remark : ''}`, 'requests');
