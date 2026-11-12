@@ -2,10 +2,10 @@
 
 ## Runtime
 
-`index.html` remains the only application file. It uses vanilla JavaScript, internal
-CSS, Google Fonts/Material Symbols, and the pinned Supabase JS v2 CDN. With placeholder
-configuration it uses localStorage Demo Mode. With real Supabase values it uses Auth,
-Postgres, RLS, and Realtime.
+`index.html` remains a vanilla JavaScript frontend. The DCISM deployment uses the
+same-origin PHP API in `dcism-api/`; PostgreSQL credentials and authorization stay
+server-side. The frontend supports email or Student ID login through PHP sessions.
+The original Supabase integration remains available only when `DCISM_MODE` is disabled.
 
 ## Tables
 
@@ -21,36 +21,26 @@ Postgres, RLS, and Realtime.
 | `notifications` | Per-profile notification bell items |
 | `student_profile_data` | Extended student profile and medical-clearance fields |
 
-`auth.users` is owned by Supabase Auth. A signup trigger creates a `profiles` row with
-role `student`; the browser cannot select its own role. `email_for_login()` supports
-the existing student-ID login experience without returning passwords or other records.
+For DCISM, `users` stores password hashes and `profiles` stores the application role.
+`login.php`, `me.php`, and `logout.php` manage the PHP session; `state.php` returns
+only the authenticated user's data (or admin data for an authorized admin).
 
-## RLS summary
+## Authorization
 
-- Authenticated students can read courses, programs, and enrollment settings.
-- Students can read/write only their own profile-owned enrollments, requests,
-  notifications, and profile data.
-- Admins can manage catalog, settings, student records, enrollments, requests, and
-  notifications, and can read/insert audit logs.
-- Only `super_admin` can change profile roles. The database trigger blocks role changes
-  by ordinary admins and students.
-- `is_admin()` and `is_super_admin()` are `SECURITY DEFINER` helpers with a fixed
-  `search_path`; UI guards are not security controls.
+PHP endpoints must enforce the equivalent ownership and role rules. UI guards are not
+security controls. Write endpoints should use transactions and derive the role from
+the server-side session rather than browser-supplied values.
 
-## Realtime channel map
+## Updates
 
-After authentication, the client subscribes to `postgres_changes` on:
+The PHP deployment currently loads state on login/session restore. Realtime subscriptions
+from Supabase are not available on DCISM; add polling or a server push layer if live
+updates are required.
 
-`profiles`, `programs`, `courses`, `enrollments`, `special_requests`,
-`notifications`, `enrollment_settings`, and `audit_logs`.
+## DCISM deployment
 
-Events trigger a fresh RLS-filtered query and a focused re-render. Channels are removed
-on logout. Connection failures show a Reconnecting indicator and refetch when the
-channel recovers. The migration adds the tables to `supabase_realtime` and uses full
-replica identity for update/delete reconciliation.
-
-## Deployment
-
-GitHub Pages builds the root `index.html` into a static artifact. Supabase migrations
-are run manually in SQL Editor or with the CLI; the optional manual GitHub Actions
-workflow uses repository secrets and never stores them in source.
+Upload `index.html` and the `dcism-api/` directory to the Dynamic Web Hosting document
+root. On the server, replace `REPLACE_ON_SERVER_ONLY` in `dcism-api/db.php` with the
+database password (never commit it). Run `dcism-schema.sql` and `dcism-demo-data.sql`
+in Adminer before first use. Delete `db-test.php` and `php-check.php` after confirming
+the host configuration, and keep HTTPS/Force TLS enabled.

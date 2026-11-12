@@ -2181,10 +2181,13 @@
     <!-- JAVASCRIPT LOGIC (RELATIONAL DB + PORTAL + ADMIN) -->
     <script>
         // ===== FORK SETUP: paste your Supabase values here =====
-        const SUPABASE_URL = 'https://eczeqokslwxegmgvmspp.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_KO-sJHiJKOmrSh6THCuu0g_QlzvdRPK';
+        const DCISM_API_BASE = '/dcism-api';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         const ENABLE_DEMO_ACCOUNTS = true;
-        const BACKEND_MODE = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+        const DCISM_MODE = true;
+        let dcismOnline = DCISM_MODE;
+        const BACKEND_MODE = !DCISM_MODE && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
         const supabaseClient = BACKEND_MODE && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         // shorthand used throughout the script
         const byId = id => document.getElementById(id);
@@ -2231,7 +2234,7 @@
             const banner = document.createElement('div');
             banner.id = 'demo-mode-banner';
             banner.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:500;max-width:calc(100% - 24px);padding:10px 14px;border:1px solid #FDE68A;border-radius:10px;background:#FFFBEB;color:#92400E;font-size:12px;box-shadow:0 6px 18px rgba(15,23,42,.12);display:flex;align-items:center;gap:12px;';
-            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. Configure Supabase to enable shared data.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
+            banner.innerHTML = '<span>Demo mode: data is only saved in this browser. Connect the DCISM PHP API to enable shared data.</span><button type="button" aria-label="Dismiss demo mode notice" style="border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer;line-height:1;" onclick="this.parentElement.remove()">×</button>';
             document.body.appendChild(banner);
         }
         function backendError(context, error) {
@@ -2711,6 +2714,89 @@
         let specialRequests = [];
 
         // STATE PERSISTENCE
+        async function dcismRequest(path, options = {}) {
+            const response = await fetch(`${DCISM_API_BASE}/${path}`, {
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+                ...options
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok || payload.ok === false) throw new Error(payload.error || 'DCISM request failed.');
+            return payload;
+        }
+        async function loadDcismState() {
+            const payload = await dcismRequest('state.php');
+            const state = payload.state || {};
+            programs = (state.programs || []).map(p => ({ ...p, subjectCodes: p.subject_codes || [] }));
+            courses = (state.courses || []).map(c => ({
+                ...c, id: c.id, code: c.code, name: c.name, title: c.title || `${c.code} - ${c.name}`,
+                desc: c.description || '', programCode: c.program_code, maxCapacity: Number(c.max_capacity),
+                enrolledCount: Number(c.enrolled_count || 0), scheduleText: c.schedule_text, details: c.details || '',
+                startHour: Number(c.start_hour), duration: Number(c.duration), type: c.course_type,
+                prereq: c.prerequisite || '', topics: c.topics || [], status: 'available'
+            }));
+            const setting = state.settings?.[0];
+            enrollmentSettings = setting ? {
+                ...setting, mode: setting.mode === 'automatic' ? 'auto' : setting.mode,
+                startDateTime: setting.start_date_time, endDateTime: setting.end_date_time,
+                manualStatus: setting.manual_status, academicYear: setting.academic_year
+            } : { ...DEFAULT_SETTINGS };
+            const profileRows = state.profiles || [];
+            const profileById = new Map(profileRows.map(p => [p.id, p]));
+            enrollments = (state.enrollments || []).map(e => ({
+                ...e, studentId: profileById.get(e.student_id)?.student_id || e.student_id,
+                subjectCode: e.subject_code || '', courseId: e.course_id, programCode: e.program_code,
+                dateSubmitted: e.date_submitted || e.created_at
+            }));
+            specialRequests = (state.requests || []).map(r => ({
+                ...r, studentId: profileById.get(r.student_id)?.student_id || r.student_id,
+                subjectCode: r.subject_code || '', dateSubmitted: r.date_submitted || r.created_at,
+                adminRemark: r.admin_remark, decidedBy: r.decided_by, decidedAt: r.decided_at
+            }));
+            students = profileRows.filter(p => p.role === 'student').map(p => ({
+                id: p.id, userId: p.id, studentId: p.student_id || p.id, fullName: p.full_name || 'Student',
+                email: p.email || '', contact: p.contact || 'Not provided', programCode: p.program_code || '',
+                yearLevel: p.year_level || '', enrollmentStatus: p.enrollment_status || 'Not Enrolled',
+                registeredOn: p.created_at, isDemo: !!p.is_demo
+            }));
+            admins = profileRows.filter(p => p.role === 'admin' || p.role === 'super_admin').map(p => ({
+                id: p.id, userId: p.id, username: p.username || p.email, email: p.email,
+                fullName: p.full_name || 'Administrator', role: p.role, isDemo: !!p.is_demo
+            }));
+            auditLogs = state.auditLogs || [];
+            const dataRow = state.profileData;
+            if (dataRow) {
+                profileData = {
+                    fname: dataRow.first_name || '', mname: dataRow.middle_name || '', lname: dataRow.last_name || '',
+                    email: profileRows.find(p => p.id === currentSession.authUserId)?.email || '',
+                    phone: dataRow.phone || '', dob: dataRow.date_of_birth || '', campus: dataRow.campus || '',
+                    address: dataRow.address || '', guardian: dataRow.guardian || '', avatar: dataRow.avatar_url || ''
+                };
+                medicalCleared = !!dataRow.medical_cleared;
+            }
+            notifications = (state.notifications || []).map(n => ({ ...n, target: n.target || 'dashboard' }));
+            syncStudentCoursesWithEnrollments();
+        }
+        async function restoreDcismSession(user) {
+            currentSession = {
+                role: user.role, userId: user.student_id || user.id, authUserId: user.id,
+                name: user.full_name || user.email, isDemo: !!user.is_demo
+            };
+            await loadDcismState();
+            setupCustomSignupSelects();
+            if (user.role === 'admin' || user.role === 'super_admin') {
+                byId('login-view').style.display = 'none';
+                byId('signup-view').style.display = 'none';
+                byId('app-view').style.display = 'none';
+                byId('admin-view').style.display = 'flex';
+                byId('admin-sidebar-user').innerText = user.full_name || user.email;
+                setDemoBadge(!!user.is_demo);
+                navigateAdmin('admin-dashboard');
+            } else {
+                const student = students.find(item => item.userId === user.id || item.studentId === user.student_id);
+                enterStudentPortal(student || { studentId: user.student_id || user.id, fullName: user.full_name || user.email, email: user.email });
+            }
+        }
         async function loadBackendState() {
             const [programRows, courseRows, enrollmentRows, requestRows, profileRows] = await Promise.all([
                 supabaseQuery(supabaseClient.from('programs').select('*').order('code'), 'Loading programs'),
@@ -2795,6 +2881,10 @@
             syncStudentCoursesWithEnrollments();
         }
         async function loadState() {
+            if (DCISM_MODE && dcismOnline) {
+                await loadDcismState();
+                return;
+            }
             if (BACKEND_MODE) {
                 await loadBackendState();
                 return;
@@ -3756,7 +3846,7 @@
         async function signInDemoAccount(kind) {
             if (!ENABLE_DEMO_ACCOUNTS) return;
             const email = kind === 'admin' ? 'admin.demo@enrolla.test' : 'student.demo@enrolla.test';
-            if (!BACKEND_MODE) {
+            if (DCISM_MODE || !BACKEND_MODE) {
                 byId('login-id').value = kind === 'admin' ? email : '12345678';
                 byId('login-pass').value = 'Demo@12345';
                 await handleLoginSubmit();
@@ -3794,7 +3884,21 @@
             const identifier = (byId('login-id').value || '').trim();
             const rawPass = byId('login-pass').value || '';
             if (!identifier || !rawPass) {
-                showToast('Please enter your username or ID number and password.', 'warning');
+                showToast('Please enter your email or Student ID and password.', 'warning');
+                return false;
+            }
+            if (DCISM_MODE && dcismOnline) {
+                try {
+                    const payload = await dcismRequest('login.php', {
+                        method: 'POST',
+                        body: JSON.stringify({ identifier, password: rawPass })
+                    });
+                    await restoreDcismSession(payload.user);
+                    byId('login-pass').value = '';
+                } catch (error) {
+                    byId('login-pass').value = '';
+                    showToast(error.message || 'Incorrect email, Student ID, or password.', 'error');
+                }
                 return false;
             }
             if (BACKEND_MODE) {
@@ -4758,7 +4862,11 @@
         function closeModal(id) { byId(id).classList.remove('open'); }
         async function logout(e) {
             if (e) e.stopPropagation();
-            saveState();
+            if (!DCISM_MODE || !dcismOnline) saveState();
+            if (DCISM_MODE && dcismOnline) {
+                try { await dcismRequest('logout.php', { method: 'POST', body: '{}' }); }
+                catch (error) { console.error('[DCISM] Logout failed', error); }
+            }
             if (BACKEND_MODE && supabaseClient) {
                 await cleanupRealtimeSubscriptions();
                 await supabaseClient.auth.signOut();
@@ -6088,6 +6196,20 @@
         // Initialize state on load
         async function initializeApplication() {
             if (ENABLE_DEMO_ACCOUNTS) byId('demo-account-actions').style.display = 'flex';
+            if (DCISM_MODE && dcismOnline) {
+                try {
+                    const payload = await dcismRequest('me.php');
+                    await restoreDcismSession(payload.user);
+                } catch {
+                    dcismOnline = false;
+                    showDemoModeBanner();
+                    loadState();
+                    showLogin();
+                }
+                setupCustomSignupSelects();
+                setupSignupValidation();
+                return;
+            }
             if (!BACKEND_MODE) {
                 showDemoModeBanner();
                 loadState();
